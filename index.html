@@ -1733,7 +1733,10 @@ function vResumo(){
       html+=`</div>`;
     }
   });
-  html+=`<div class="totrow"><span>TOTAL</span><span>${money(tot)}</span></div>`;
+  const pago=paidMonth(m), resta=tot-pago;
+  html+=`<div class="totrow"><span>TOTAL DE CUSTOS</span><span>${money(tot)}</span></div>`;
+  html+=`<div class="totrow" style="border-top:1px solid var(--line)"><span>JÁ PAGUEI</span><span style="color:var(--pago)">${money(pago)}</span></div>`;
+  html+=`<div class="totrow" style="border-top:1px solid var(--line)"><span>AINDA FALTA PAGAR</span><span style="color:var(--pend)">${money(resta)}</span></div>`;
   const sobra=S.rendaFixa-tot;
   html+=`<div class="totrow"><span>SOBRA / FALTA <small class="muted">(renda ${money(S.rendaFixa)})</small></span><span class="sobra ${sobra>=0?'pos':'neg'}">${money(sobra)}</span></div>`;
   if(byFonte) html+=`<p class="muted" style="margin-top:12px">💳 Cartões = fatura que vence. Débitos = sai direto da conta.</p>`;
