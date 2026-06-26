@@ -1648,6 +1648,12 @@ function openModal(id){
     ${e?'':`<div class="fld"><label>Repetir a partir de ${S.month}</label><div class="seg" id="rep">
         <button data-rep="1" class="on">Só este mês</button><button data-rep="3">Próx. 3</button>
         <button data-rep="6">Próx. 6</button><button data-rep="all">Até ${S.months[S.months.length-1]}</button></div></div>`}
+    ${e?`<div class="fld"><label>Mover / copiar para outro mês</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="i_movem" style="flex:1;min-width:120px;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:11px 12px;font-size:14px">${S.months.filter(x=>x!==S.month).map(x=>`<option>${x}</option>`).join('')}</select>
+        <button id="i_mov" style="background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:0 16px;font-weight:700;font-size:13px">Mover →</button>
+        <button id="i_cop" style="background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:0 16px;font-weight:700;font-size:13px">Copiar</button>
+      </div><div class="hint">Mover tira de ${S.month} e leva pro mês escolhido. Copiar mantém nos dois.</div></div>`:''}
     <button class="save" id="msave">${e?'Salvar alterações':'Adicionar custo'}</button>
     ${e?`<button class="danger" id="mdel">Excluir custo</button>`:''}`;
   o.classList.add('show');
@@ -1659,6 +1665,15 @@ function openModal(id){
   document.getElementById('mx').onclick=closeModal;
   o.onclick=ev=>{if(ev.target===o)closeModal();};
   if(e&&document.getElementById('mdel'))document.getElementById('mdel').onclick=()=>{if(confirm('Excluir este custo?')){S.entries=S.entries.filter(x=>x.id!==e.id);save();closeModal();toast('Excluído');render();}};
+  const readBase=()=>{const oq=document.getElementById('i_oq').value.trim();const eu=parseFloat(eurI.value)||null;let val=parseFloat(valI.value);if((!val||isNaN(val))&&eu)val=eu*S.rate;val=val||0;
+    return {oq,eu,val,base:{oQueE:oq,detalhe:document.getElementById('i_det').value.trim(),tipo:document.getElementById('i_tipo').value,fonte:document.getElementById('i_fonte').value,categoria:document.getElementById('i_cat').value,euro:eu}};};
+  if(e){
+    document.getElementById('i_mov').onclick=()=>{const tgt=document.getElementById('i_movem').value;const {oq,val,base}=readBase();if(!oq){toast('Preencha O QUE É',true);return;}
+      Object.assign(e,base);e.vals=e.vals||{};e.paid=e.paid||{};e.vals[tgt]=val;const wasPaid=e.paid[S.month];delete e.vals[S.month];delete e.paid[S.month];if(wasPaid)e.paid[tgt]=true;
+      save();closeModal();toast('Movido para '+tgt+' ✓');S.month=tgt;render();};
+    document.getElementById('i_cop').onclick=()=>{const tgt=document.getElementById('i_movem').value;const {oq,val,base}=readBase();if(!oq){toast('Preencha O QUE É',true);return;}
+      Object.assign(e,base);e.vals=e.vals||{};e.vals[S.month]=val;e.vals[tgt]=val;save();closeModal();toast('Copiado para '+tgt+' ✓');render();};
+  }
   document.getElementById('msave').onclick=()=>{
     const oq=document.getElementById('i_oq').value.trim();
     const eu=parseFloat(eurI.value)||null; let val=parseFloat(valI.value);
@@ -1677,19 +1692,39 @@ function closeModal(){document.getElementById('ov').classList.remove('show');}
 function escAttr(s){return (s||'').replace(/"/g,'&quot;');}
 
 /* ---------- RESUMO ---------- */
+let resumoOpen=null;
 function vResumo(){
-  const m=S.month, groups={}; S.categorias.forEach(c=>groups[c]=0);
-  entriesOfMonth(m).forEach(e=>{groups[e.categoria]=(groups[e.categoria]||0)+valOf(e,m);});
+  const m=S.month, groups={}, items={}; S.categorias.forEach(c=>{groups[c]=0;items[c]=[];});
+  entriesOfMonth(m).forEach(e=>{groups[e.categoria]=(groups[e.categoria]||0)+valOf(e,m);(items[e.categoria]=items[e.categoria]||[]).push(e);});
   const tot=Object.values(groups).reduce((a,b)=>a+b,0), max=Math.max(1,...Object.values(groups));
   let html=`<div class="sec-h"><h2>Para onde vai o dinheiro — ${m}</h2><div class="ln"></div></div>`;
+  html+=`<p class="muted" style="margin:0 2px 10px">Toque numa barra pra ver os lançamentos que a compõem.</p>`;
   Object.entries(groups).sort((a,b)=>b[1]-a[1]).forEach(([c,v])=>{
-    const pc=Math.round(v/max*100), share=tot>0?Math.round(v/tot*100):0;
-    html+=`<div class="brow"><div class="bn">${c}<small>${share}% do mês</small></div>
+    const pc=Math.round(v/max*100), share=tot>0?Math.round(v/tot*100):0, open=resumoOpen===c;
+    html+=`<div class="brow" style="cursor:pointer" data-rcat="${c}"><div class="bn">${open?'▾':'▸'} ${c}<small>${share}% do mês</small></div>
       <div class="bb"><i style="width:${pc}%;background:${catColor(c)}"></i></div><div class="bv">${money(v)}</div></div>`;
+    if(open){
+      const list=(items[c]||[]).slice().sort((a,b)=>valOf(b,m)-valOf(a,m));
+      html+=`<div style="margin:-3px 0 10px;background:var(--card);border:1px solid var(--line);border-radius:11px;overflow:hidden">`;
+      if(!list.length) html+=`<div class="muted" style="padding:10px 12px">Sem lançamentos nesta categoria em ${m}.</div>`;
+      list.forEach((e,i)=>{
+        const paid=isPaid(e,m);
+        html+=`<div data-redit="${e.id}" style="cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 12px;${i?'border-top:1px solid var(--line)':''}">
+          <div style="min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.oQueE||'(sem nome)'}</div>
+            <div class="muted" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.fonte||''}${e.detalhe?' · '+e.detalhe:''}</div></div>
+          <div style="text-align:right;white-space:nowrap"><div style="font-weight:700;font-size:13px">${money(valOf(e,m))}</div>
+            <div style="font-size:10px;color:${paid?'var(--pago)':'var(--pend)'}">${paid?'✓ pago':'pendente'}</div></div></div>`;
+      });
+      html+=`</div>`;
+    }
   });
   html+=`<div class="totrow"><span>TOTAL</span><span>${money(tot)}</span></div>`;
   const sobra=S.rendaFixa-tot;
   html+=`<div class="totrow"><span>SOBRA / FALTA <small class="muted">(renda ${money(S.rendaFixa)})</small></span><span class="sobra ${sobra>=0?'pos':'neg'}">${money(sobra)}</span></div>`;
+  setTimeout(()=>{
+    document.querySelectorAll('[data-rcat]').forEach(b=>b.onclick=()=>{resumoOpen=resumoOpen===b.dataset.rcat?null:b.dataset.rcat;render();});
+    document.querySelectorAll('[data-redit]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();openModal(b.dataset.redit);});
+  },0);
   return html;
 }
 
@@ -1724,18 +1759,56 @@ function vProgresso(){
 /* ---------- DÍVIDAS ---------- */
 function vDividas(){
   let totJuros=0;
-  const rows=S.dividas.map(d=>{const j=(d.principal&&d.jurosMensal)?d.principal*d.jurosMensal:0; totJuros+=j;
+  const rows=S.dividas.map((d,idx)=>{const j=(d.principal&&d.jurosMensal)?d.principal*d.jurosMensal:0; totJuros+=j;
     const abate=d.parcela&&j?d.parcela-j:null, pj=d.parcela&&j?Math.round(j/d.parcela*100):null;
-    return `<tr><td>${d.quem||''} · <b>${d.nome||''}</b></td><td>${d.principal?money(d.principal):'—'}</td>
+    return `<tr data-dvedit="${idx}" style="cursor:pointer"><td>${d.quem||''} · <b>${d.nome||''}</b></td><td>${d.principal?money(d.principal):'—'}</td>
       <td>${d.jurosMensal!=null?(d.jurosMensal*100).toFixed(2).replace('.',',')+'%':'—'}</td><td>${d.tempo||'—'}</td>
       <td>${d.amortiza||'—'}</td><td>${d.parcela?money(d.parcela):'—'}</td><td>${j?money(j):'—'}</td>
       <td>${abate!=null?money(abate):'—'}</td><td>${pj!=null?pj+'%':'—'}</td></tr>`;}).join('');
+  setTimeout(()=>{
+    const a=document.getElementById('dvAdd'); if(a)a.onclick=()=>openDivida(null);
+    document.querySelectorAll('[data-dvedit]').forEach(b=>b.onclick=()=>openDivida(parseInt(b.dataset.dvedit)));
+  },0);
   return `<div class="sec-h"><h2>Dívidas — visão geral</h2><div class="ln"></div></div>
+    <div class="toolbar"><span class="muted">Toque numa linha pra editar.</span><button class="add" id="dvAdd">＋ Nova dívida</button></div>
     <div class="dvwrap"><table class="dv"><thead><tr><th>Quem / Nome</th><th>Principal hoje</th><th>Juros mês</th><th>Falta</th><th>Amortiza?</th><th>Parcela</th><th>Juros/mês R$</th><th>Abate dívida/mês</th><th>% parcela = juro</th></tr></thead>
     <tbody>${rows}</tbody></table></div>
     <div class="kpis" style="margin-top:14px"><div class="kpi falta"><div class="lbl">Total juros / mês</div><div class="val">${money(totJuros)}</div></div>
       <div class="kpi" style="grid-column:span 3"><div class="lbl">Por ano em juros</div><div class="val" style="color:var(--red)">${money(totJuros*12)}</div></div></div>
     <p class="muted">Juros/mês = principal × taxa. Abate = parcela − juros (quanto da parcela realmente reduz a dívida).</p>`;
+}
+function openDivida(idx){
+  const isNew=(idx==null);
+  const d=isNew?{quem:'',nome:'',principal:null,jurosMensal:null,tempo:'',amortiza:'SIM',parcela:null}:S.dividas[idx];
+  const o=document.getElementById('ov'),md=document.getElementById('modal');
+  const amU=(d.amortiza||'').toUpperCase();
+  md.innerHTML=`<h3>${isNew?'Nova dívida':'Editar dívida'}<button id="mx">×</button></h3>
+    <div class="fld two"><div><label>QUEM</label><input id="d_quem" value="${escAttr(d.quem)}" placeholder="Nelsinho"></div>
+      <div><label>NOME</label><input id="d_nome" value="${escAttr(d.nome)}" placeholder="Bradesco"></div></div>
+    <div class="fld two"><div><label>PRINCIPAL HOJE (R$)</label><input id="d_princ" type="number" inputmode="decimal" step="0.01" value="${d.principal!=null?d.principal:''}" placeholder="0,00"></div>
+      <div><label>JUROS MÊS (%)</label><input id="d_juros" type="number" inputmode="decimal" step="0.01" value="${d.jurosMensal!=null?+(d.jurosMensal*100).toFixed(4):''}" placeholder="1,07"></div></div>
+    <div class="fld two"><div><label>FALTA (tempo)</label><input id="d_tempo" value="${escAttr(d.tempo)}" placeholder="60 MESES"></div>
+      <div><label>AMORTIZA?</label><select id="d_amort"><option ${amU==='SIM'?'selected':''}>SIM</option><option ${amU==='NÃO'?'selected':''}>NÃO</option></select></div></div>
+    <div class="fld"><label>PARCELA (R$)</label><input id="d_parc" type="number" inputmode="decimal" step="0.01" value="${d.parcela!=null?d.parcela:''}" placeholder="0,00"></div>
+    <div class="hint" id="dHint"></div>
+    <button class="save" id="dsave">${isNew?'Adicionar dívida':'Salvar alterações'}</button>
+    ${isNew?'':`<button class="danger" id="ddel">Excluir dívida</button>`}`;
+  o.classList.add('show');
+  const upd=()=>{const pr=parseFloat(document.getElementById('d_princ').value),ju=parseFloat(document.getElementById('d_juros').value),pa=parseFloat(document.getElementById('d_parc').value);
+    const j=(pr>0&&ju>0)?pr*ju/100:0; const ab=(pa>0&&j)?pa-j:null;
+    document.getElementById('dHint').textContent=j?`Juros/mês ≈ ${money(j)}${ab!=null?` · abate ${money(ab)}`:''}`:'';};
+  ['d_princ','d_juros','d_parc'].forEach(id=>document.getElementById(id).oninput=upd); upd();
+  document.getElementById('mx').onclick=closeModal;
+  o.onclick=ev=>{if(ev.target===o)closeModal();};
+  if(!isNew)document.getElementById('ddel').onclick=()=>{if(confirm('Excluir esta dívida?')){S.dividas.splice(idx,1);save();closeModal();toast('Excluída');render();}};
+  document.getElementById('dsave').onclick=()=>{
+    const pr=parseFloat(document.getElementById('d_princ').value),ju=parseFloat(document.getElementById('d_juros').value),pa=parseFloat(document.getElementById('d_parc').value);
+    const obj={quem:document.getElementById('d_quem').value.trim(),nome:document.getElementById('d_nome').value.trim(),
+      principal:isNaN(pr)?null:pr,jurosMensal:isNaN(ju)?null:ju/100,tempo:document.getElementById('d_tempo').value.trim(),
+      amortiza:document.getElementById('d_amort').value,parcela:isNaN(pa)?null:pa};
+    if(isNew)S.dividas.push(obj); else S.dividas[idx]=obj;
+    save();closeModal();toast(isNew?'Dívida adicionada ✓':'Salvo ✓');render();
+  };
 }
 
 /* ---------- CONFIG ---------- */
