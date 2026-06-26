@@ -1541,7 +1541,7 @@ const CATCOL={"FIXOS":"var(--fix)","DIVIDA":"var(--div)","MÃE":"var(--mae)","RE
 const catColor=c=>CATCOL[c]||"var(--mut)";
 
 /* ---------- SHELL ---------- */
-const TABS=[["controle","CONTROLE"],["custos","CUSTOS"],["resumo","RESUMO"],["fonte","POR FONTE"],["progresso","PROGRESSO"],["dividas","DÍVIDAS"],["config","⚙"]];
+const TABS=[["controle","CONTROLE"],["custos","CUSTOS"],["resumo","RESUMO"],["progresso","PROGRESSO"],["dividas","DÍVIDAS"],["config","⚙"]];
 function renderShell(){
   const sel=document.getElementById('mSel');
   sel.innerHTML=monthsList().map(m=>`<option ${m===S.month?'selected':''}>${m}</option>`).join('');
@@ -1552,8 +1552,9 @@ function renderShell(){
 }
 let filt={q:"",fonte:"",cat:"",st:""};
 function render(){
+  if(S.view==='fonte')S.view='resumo';
   renderShell();
-  document.getElementById('app').innerHTML=({controle:vControle,custos:vCustos,resumo:vResumo,fonte:vFonte,progresso:vProgresso,dividas:vDividas,config:vConfig}[S.view])();
+  document.getElementById('app').innerHTML=({controle:vControle,custos:vCustos,resumo:vResumo,fonte:vResumo,progresso:vProgresso,dividas:vDividas,config:vConfig}[S.view]||vControle)();
   if(S.view==='custos')wireCustos();
   if(S.view==='config')wireConfig();
 }
@@ -1692,26 +1693,35 @@ function closeModal(){document.getElementById('ov').classList.remove('show');}
 function escAttr(s){return (s||'').replace(/"/g,'&quot;');}
 
 /* ---------- RESUMO ---------- */
-let resumoOpen=null;
+let resumoOpen=null, resumoMode='cat';
 function vResumo(){
-  const m=S.month, groups={}, items={}; S.categorias.forEach(c=>{groups[c]=0;items[c]=[];});
-  entriesOfMonth(m).forEach(e=>{groups[e.categoria]=(groups[e.categoria]||0)+valOf(e,m);(items[e.categoria]=items[e.categoria]||[]).push(e);});
+  const m=S.month, byFonte=resumoMode==='fonte';
+  const keys = byFonte ? S.fontes : S.categorias;
+  const groups={}, items={}; keys.forEach(k=>{groups[k]=0;items[k]=[];});
+  entriesOfMonth(m).forEach(e=>{const k=byFonte?e.fonte:e.categoria;groups[k]=(groups[k]||0)+valOf(e,m);(items[k]=items[k]||[]).push(e);});
   const tot=Object.values(groups).reduce((a,b)=>a+b,0), max=Math.max(1,...Object.values(groups));
-  let html=`<div class="sec-h"><h2>Para onde vai o dinheiro — ${m}</h2><div class="ln"></div></div>`;
+  const titulo = byFonte ? 'Quanto sai de cada conta' : 'Para onde vai o dinheiro';
+  let html=`<div class="sec-h"><h2>${titulo} — ${m}</h2><div class="ln"></div></div>`;
+  html+=`<div class="seg" style="margin:0 0 12px;max-width:340px">
+      <button data-rmode="cat" class="${byFonte?'':'on'}">Por categoria</button>
+      <button data-rmode="fonte" class="${byFonte?'on':''}">Por fonte</button></div>`;
   html+=`<p class="muted" style="margin:0 2px 10px">Toque numa barra pra ver os lançamentos que a compõem.</p>`;
-  Object.entries(groups).sort((a,b)=>b[1]-a[1]).forEach(([c,v])=>{
-    const pc=Math.round(v/max*100), share=tot>0?Math.round(v/tot*100):0, open=resumoOpen===c;
-    html+=`<div class="brow" style="cursor:pointer" data-rcat="${c}"><div class="bn">${open?'▾':'▸'} ${c}<small>${share}% do mês</small></div>
-      <div class="bb"><i style="width:${pc}%;background:${catColor(c)}"></i></div><div class="bv">${money(v)}</div></div>`;
+  Object.entries(groups).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+    const pc=Math.round(v/max*100), share=tot>0?Math.round(v/tot*100):0, open=resumoOpen===k;
+    const col = byFonte ? (k.startsWith('CARTÃO')?'var(--pend)':'var(--fix)') : catColor(k);
+    let sub;
+    if(byFonte){const meta=S.fonteMeta[k]||{tipo:'',vence:'—'}; sub=`${meta.tipo} · vence ${meta.vence}`;} else sub=`${share}% do mês`;
+    html+=`<div class="brow" style="cursor:pointer" data-rkey="${escAttr(k)}"><div class="bn">${open?'▾':'▸'} ${k}<small>${sub}</small></div>
+      <div class="bb"><i style="width:${pc}%;background:${col}"></i></div><div class="bv">${money(v)}</div></div>`;
     if(open){
-      const list=(items[c]||[]).slice().sort((a,b)=>valOf(b,m)-valOf(a,m));
+      const list=(items[k]||[]).slice().sort((a,b)=>valOf(b,m)-valOf(a,m));
       html+=`<div style="margin:-3px 0 10px;background:var(--card);border:1px solid var(--line);border-radius:11px;overflow:hidden">`;
-      if(!list.length) html+=`<div class="muted" style="padding:10px 12px">Sem lançamentos nesta categoria em ${m}.</div>`;
+      if(!list.length) html+=`<div class="muted" style="padding:10px 12px">Sem lançamentos em ${m}.</div>`;
       list.forEach((e,i)=>{
-        const paid=isPaid(e,m);
+        const paid=isPaid(e,m), sub2=byFonte?(e.categoria||''):(e.fonte||'');
         html+=`<div data-redit="${e.id}" style="cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 12px;${i?'border-top:1px solid var(--line)':''}">
           <div style="min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.oQueE||'(sem nome)'}</div>
-            <div class="muted" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.fonte||''}${e.detalhe?' · '+e.detalhe:''}</div></div>
+            <div class="muted" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub2}${e.detalhe?' · '+e.detalhe:''}</div></div>
           <div style="text-align:right;white-space:nowrap"><div style="font-weight:700;font-size:13px">${money(valOf(e,m))}</div>
             <div style="font-size:10px;color:${paid?'var(--pago)':'var(--pend)'}">${paid?'✓ pago':'pendente'}</div></div></div>`;
       });
@@ -1721,25 +1731,45 @@ function vResumo(){
   html+=`<div class="totrow"><span>TOTAL</span><span>${money(tot)}</span></div>`;
   const sobra=S.rendaFixa-tot;
   html+=`<div class="totrow"><span>SOBRA / FALTA <small class="muted">(renda ${money(S.rendaFixa)})</small></span><span class="sobra ${sobra>=0?'pos':'neg'}">${money(sobra)}</span></div>`;
+  if(byFonte) html+=`<p class="muted" style="margin-top:12px">💳 Cartões = fatura que vence. Débitos = sai direto da conta.</p>`;
   setTimeout(()=>{
-    document.querySelectorAll('[data-rcat]').forEach(b=>b.onclick=()=>{resumoOpen=resumoOpen===b.dataset.rcat?null:b.dataset.rcat;render();});
+    document.querySelectorAll('[data-rmode]').forEach(b=>b.onclick=()=>{resumoMode=b.dataset.rmode;resumoOpen=null;render();});
+    document.querySelectorAll('[data-rkey]').forEach(b=>b.onclick=()=>{resumoOpen=resumoOpen===b.dataset.rkey?null:b.dataset.rkey;render();});
     document.querySelectorAll('[data-redit]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();openModal(b.dataset.redit);});
   },0);
   return html;
 }
 
 /* ---------- POR FONTE ---------- */
+let fonteOpen=null;
 function vFonte(){
-  const m=S.month, g={}; S.fontes.forEach(f=>g[f]=0);
-  entriesOfMonth(m).forEach(e=>{g[e.fonte]=(g[e.fonte]||0)+valOf(e,m);});
+  const m=S.month, g={}, items={}; S.fontes.forEach(f=>{g[f]=0;items[f]=[];});
+  entriesOfMonth(m).forEach(e=>{g[e.fonte]=(g[e.fonte]||0)+valOf(e,m);(items[e.fonte]=items[e.fonte]||[]).push(e);});
   const tot=Object.values(g).reduce((a,b)=>a+b,0),max=Math.max(1,...Object.values(g));
   let html=`<div class="sec-h"><h2>Quanto sai de cada conta — ${m}</h2><div class="ln"></div></div>`;
+  html+=`<p class="muted" style="margin:0 2px 10px">Toque numa barra pra ver os lançamentos da conta.</p>`;
   Object.entries(g).sort((a,b)=>b[1]-a[1]).forEach(([f,v])=>{
-    const meta=S.fonteMeta[f]||{tipo:'',vence:'—'}, pc=Math.round(v/max*100), col=f.startsWith('CARTÃO')?'var(--pend)':'var(--fix)';
-    html+=`<div class="brow"><div class="bn">${f}<small>${meta.tipo} · vence ${meta.vence}</small></div>
+    const meta=S.fonteMeta[f]||{tipo:'',vence:'—'}, pc=Math.round(v/max*100), col=f.startsWith('CARTÃO')?'var(--pend)':'var(--fix)', open=fonteOpen===f;
+    html+=`<div class="brow" style="cursor:pointer" data-fonte="${escAttr(f)}"><div class="bn">${open?'▾':'▸'} ${f}<small>${meta.tipo} · vence ${meta.vence}</small></div>
       <div class="bb"><i style="width:${pc}%;background:${col}"></i></div><div class="bv">${money(v)}</div></div>`;
+    if(open){
+      const list=(items[f]||[]).slice().sort((a,b)=>valOf(b,m)-valOf(a,m));
+      html+=`<div style="margin:-3px 0 10px;background:var(--card);border:1px solid var(--line);border-radius:11px;overflow:hidden">`;
+      if(!list.length) html+=`<div class="muted" style="padding:10px 12px">Sem lançamentos nesta conta em ${m}.</div>`;
+      list.forEach((e,i)=>{const paid=isPaid(e,m);
+        html+=`<div data-fedit="${e.id}" style="cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 12px;${i?'border-top:1px solid var(--line)':''}">
+          <div style="min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.oQueE||'(sem nome)'}</div>
+            <div class="muted" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.categoria||''}${e.detalhe?' · '+e.detalhe:''}</div></div>
+          <div style="text-align:right;white-space:nowrap"><div style="font-weight:700;font-size:13px">${money(valOf(e,m))}</div>
+            <div style="font-size:10px;color:${paid?'var(--pago)':'var(--pend)'}">${paid?'✓ pago':'pendente'}</div></div></div>`;});
+      html+=`</div>`;
+    }
   });
   html+=`<div class="totrow"><span>TOTAL</span><span>${money(tot)}</span></div>`;
+  setTimeout(()=>{
+    document.querySelectorAll('[data-fonte]').forEach(b=>b.onclick=()=>{fonteOpen=fonteOpen===b.dataset.fonte?null:b.dataset.fonte;render();});
+    document.querySelectorAll('[data-fedit]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();openModal(b.dataset.fedit);});
+  },0);
   return html+`<p class="muted" style="margin-top:12px">💳 Cartões = fatura que vence. Débitos = sai direto da conta.</p>`;
 }
 
