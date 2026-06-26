@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="theme-color" content="#0f1115">
+<title>NELSINHO CONTAS</title>
+<style>
+:root{
+  --bg:#0f1115; --bg2:#171a21; --card:#1c2029; --card2:#232834; --line:#2c3340;
+  --txt:#e8ecf3; --mut:#8b93a3; --mut2:#646c7d;
+  --acc:#5b8cff; --acc2:#3a66d6;
+  --pago:#22c08a; --pago-bg:#103127;
+  --pend:#f0a33c; --pend-bg:#332514;
+  --red:#ef5f6b; --red-bg:#33191c;
+  --fix:#6ea8fe; --div:#ef5f6b; --mae:#c084fc; --ref:#f0a33c; --ext:#34d3b6; --var:#9aa6ba;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  font-size:15px;line-height:1.45}
+a{color:var(--acc)} h1,h2,h3{margin:0}
+button{font-family:inherit;cursor:pointer}
+.wrap{max-width:1100px;margin:0 auto;padding:0 14px 90px}
+
+header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,#0f1115,#0f1115ee);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 0 8px}
+.hd{max-width:1100px;margin:0 auto;padding:0 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-weight:800;letter-spacing:.5px;font-size:16px;display:flex;align-items:center;gap:8px}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px var(--acc)}
+.sync{font-size:11px;color:var(--mut);display:flex;align-items:center;gap:5px}
+.sync .sd{width:7px;height:7px;border-radius:50%;background:var(--pago)}
+.sync.saving .sd{background:var(--pend);animation:pulse 1s infinite}
+.sync.off .sd{background:var(--red)}
+@keyframes pulse{50%{opacity:.3}}
+.msel{display:flex;align-items:center;gap:6px;margin-left:auto;background:var(--card);
+  border:1px solid var(--line);border-radius:11px;padding:4px}
+.msel button{background:none;border:none;color:var(--txt);font-size:17px;width:30px;height:30px;border-radius:8px}
+.msel button:hover{background:var(--card2)}
+.msel select{background:none;border:none;color:var(--txt);font-weight:700;font-size:14px;
+  appearance:none;padding:4px 6px;min-width:104px;text-align:center;text-align-last:center}
+.renda{font-size:12px;color:var(--mut);width:100%;text-align:right;margin-top:2px}
+.renda b{color:var(--txt)}
+
+nav.tabs{display:flex;gap:4px;overflow-x:auto;padding:8px 0 2px;-ms-overflow-style:none;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{white-space:nowrap;background:var(--card);border:1px solid var(--line);color:var(--mut);
+  padding:7px 13px;border-radius:10px;font-size:13px;font-weight:600}
+nav.tabs button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px}
+.kpi .lbl{font-size:11px;color:var(--mut);letter-spacing:.4px;text-transform:uppercase}
+.kpi .val{font-size:21px;font-weight:800;margin-top:3px}
+.kpi.pago .val{color:var(--pago)} .kpi.falta .val{color:var(--pend)} .kpi.pct .val{color:var(--acc)}
+.bar{height:7px;background:var(--card2);border-radius:6px;overflow:hidden;margin-top:9px}
+.bar > i{display:block;height:100%;background:var(--pago);border-radius:6px}
+
+.sec-h{display:flex;align-items:center;gap:10px;margin:18px 2px 10px}
+.sec-h h2{font-size:14px;letter-spacing:.5px;color:var(--mut);text-transform:uppercase;font-weight:700}
+.sec-h .ln{flex:1;height:1px;background:var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.fcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px}
+.fcard .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.fcard .nm{font-weight:700;font-size:14px}
+.fcard .sub{font-size:11px;color:var(--mut);margin-top:1px}
+.fcard .amt{font-weight:800;font-size:17px;text-align:right}
+.fcard .meta{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-top:9px}
+
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.toolbar input[type=search],.toolbar select{background:var(--card);border:1px solid var(--line);color:var(--txt);
+  border-radius:10px;padding:8px 10px;font-size:13px}
+.toolbar input[type=search]{flex:1;min-width:140px}
+.add{margin-left:auto;background:var(--acc);border:none;color:#fff;font-weight:700;padding:9px 15px;
+  border-radius:10px;font-size:13px;display:flex;align-items:center;gap:6px}
+.add:hover{background:var(--acc2)}
+
+.list{display:flex;flex-direction:column;gap:7px}
+.row{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+  display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center}
+.row.is-pago{opacity:.62}
+.row .main{min-width:0}
+.row .nm{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .det{font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.chip{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700;letter-spacing:.3px;border:1px solid var(--line);color:var(--mut)}
+.chip.tipo{background:var(--card2)}
+.chip.cat{border:none;color:#0c0e12}
+.row .amt{font-weight:800;font-size:15px;text-align:right;white-space:nowrap}
+.row .amt small{display:block;font-weight:500;font-size:10px;color:var(--mut2)}
+.baixa{border:1px solid var(--line);background:var(--pend-bg);color:var(--pend);font-weight:700;font-size:12px;
+  padding:8px 11px;border-radius:10px;white-space:nowrap;min-width:96px;text-align:center}
+.baixa.pago{background:var(--pago-bg);color:var(--pago)}
+.rowact{display:flex;gap:4px;margin-top:6px}
+.rowact button{background:none;border:none;color:var(--mut2);font-size:11px;padding:2px 4px}
+.rowact button:hover{color:var(--txt)}
+.empty{text-align:center;color:var(--mut);padding:40px 10px;font-size:13px}
+
+.brow{display:grid;grid-template-columns:140px 1fr 110px;gap:12px;align-items:center;
+  background:var(--card);border:1px solid var(--line);border-radius:11px;padding:10px 13px;margin-bottom:7px}
+.brow .bn{font-weight:700;font-size:13px}
+.brow .bn small{display:block;color:var(--mut);font-weight:500;font-size:11px}
+.brow .bb{height:10px;background:var(--card2);border-radius:6px;overflow:hidden}
+.brow .bb > i{display:block;height:100%;border-radius:6px}
+.brow .bv{text-align:right;font-weight:800;font-size:14px}
+.totrow{display:flex;justify-content:space-between;padding:12px 13px;margin-top:6px;
+  border-top:2px solid var(--line);font-weight:800}
+.sobra{font-size:18px}
+.sobra.pos{color:var(--pago)} .sobra.neg{color:var(--red)}
+
+table.dv{width:100%;border-collapse:collapse;font-size:12.5px}
+table.dv th,table.dv td{padding:9px 8px;text-align:right;border-bottom:1px solid var(--line)}
+table.dv th{color:var(--mut);font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;font-weight:700}
+table.dv td:first-child,table.dv th:first-child{text-align:left}
+table.dv tr:last-child td{border:none}
+.dvwrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 12px}
+
+.ov{position:fixed;inset:0;background:#000a;z-index:50;display:none;align-items:flex-end;justify-content:center}
+.ov.show{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--line);border-radius:18px 18px 0 0;width:100%;max-width:560px;
+  max-height:92vh;overflow-y:auto;padding:18px 16px 26px;animation:up .2s ease}
+@keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}}
+@media(min-width:600px){.ov{align-items:center}.modal{border-radius:18px}}
+.modal h3{font-size:16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.modal h3 button{background:none;border:none;color:var(--mut);font-size:22px}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;font-weight:700}
+.fld input,.fld select,.fld textarea{width:100%;background:var(--card);border:1px solid var(--line);color:var(--txt);
+  border-radius:10px;padding:11px 12px;font-size:15px}
+.fld.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fld.two > div{min-width:0}
+.hint{font-size:11px;color:var(--mut2);margin-top:5px}
+.save{width:100%;background:var(--acc);border:none;color:#fff;font-weight:800;padding:14px;border-radius:12px;font-size:15px;margin-top:6px}
+.save:hover{background:var(--acc2)}
+.danger{background:var(--red-bg);color:var(--red);border:1px solid var(--red);border-radius:10px;padding:11px;width:100%;font-weight:700;margin-top:8px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;min-width:90px;background:var(--card);border:1px solid var(--line);color:var(--mut);padding:9px;border-radius:9px;font-size:12px;font-weight:700}
+.seg button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+
+.setgrp{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.setgrp h4{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);margin-bottom:12px}
+.setrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.setrow input{width:130px;background:var(--bg2);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:8px 10px;text-align:right;font-size:14px}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btnrow button{flex:1;min-width:130px;border-radius:10px;padding:11px;font-weight:700;font-size:13px;border:1px solid var(--line);background:var(--card2);color:var(--txt)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--pago);color:#06241a;
+  font-weight:700;padding:11px 18px;border-radius:30px;z-index:99;font-size:13px;opacity:0;transition:.25s;pointer-events:none}
+.toast.show{opacity:1;bottom:30px}
+.toast.err{background:var(--red);color:#fff}
+.muted{color:var(--mut);font-size:12px}
+
+/* AUTH GATE */
+#gate{position:fixed;inset:0;z-index:80;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:22px}
+#gate .box{width:100%;max-width:360px;text-align:center}
+#gate .lg{font-size:22px;font-weight:800;letter-spacing:.5px;display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:6px}
+#gate .lg .dot{width:11px;height:11px;border-radius:50%;background:var(--acc);box-shadow:0 0 12px var(--acc)}
+#gate p{color:var(--mut);font-size:13px;margin:0 0 20px}
+#gate input{width:100%;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:14px;font-size:16px;text-align:center;margin-bottom:10px}
+#gate button{width:100%;background:var(--acc);border:none;color:#fff;font-weight:800;padding:14px;border-radius:12px;font-size:15px}
+#gate .ge{color:var(--red);font-size:13px;min-height:18px;margin-top:4px}
+#gate .loading{color:var(--mut);font-size:13px}
+@media(max-width:560px){.kpis{grid-template-columns:1fr 1fr}.kpi .val{font-size:18px}
+  .brow{grid-template-columns:100px 1fr 84px;gap:8px}.brow .bn{font-size:12px}}
+</style>
+</head>
+<body>
+
+<div id="gate"><div class="box">
+  <div class="lg"><span class="dot"></span>NELSINHO CONTAS</div>
+  <div id="gateBody"><div class="loading">Conectando…</div></div>
+</div></div>
+
+<header style="display:none" id="hdr">
+  <div class="hd">
+    <div class="brand"><span class="dot"></span>NELSINHO CONTAS</div>
+    <div class="sync" id="sync"><span class="sd"></span><span id="syncT">na nuvem</span></div>
+    <div class="msel">
+      <button id="mPrev">&lsaquo;</button>
+      <select id="mSel"></select>
+      <button id="mNext">&rsaquo;</button>
+    </div>
+    <div class="renda">RENDA FIXA / MÊS: <b id="rendaTop"></b></div>
+  </div>
+  <div class="hd"><nav class="tabs" id="tabs"></nav></div>
+</header>
+
+<div class="wrap" id="app" style="display:none"></div>
+
+<div class="ov" id="ov"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const SEED = {
+ "rate": 6.168839819999999,
+ "rendaFixa": 80000,
+ "months": [
+  "Junho/26",
+  "Julho/26",
+  "Agosto/26",
+  "Setembro/26",
+  "Outubro/26",
+  "Novembro/26",
+  "Dezembro/26",
+  "Janeiro/27",
+  "Fevereiro/27",
+  "Março/27",
+  "Abril/27",
+  "Maio/27",
+  "Junho/27",
+  "Julho/27"
+ ],
+ "entries": [
+  {
+   "oQueE": "LANÇAMENTOS INTERNACIONAIS",
+   "tipo": "MENSAL",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "DIVERSOS VARIÁVEL",
+   "detalhe": "PORTUGAL (iof, supermercado, roupas, lazer, remedios, medicos)",
+   "euro": null,
+   "vals": {
+    "Julho/26": 9500.0,
+    "Agosto/26": 8000.0,
+    "Setembro/26": 8000.0,
+    "Outubro/26": 8000.0,
+    "Novembro/26": 8000.0,
+    "Dezembro/26": 8000.0,
+    "Janeiro/27": 8000.0,
+    "Fevereiro/27": 8000.0,
+    "Março/27": 8000.0,
+    "Abril/27": 8000.0,
+    "Maio/27": 8000.0,
+    "Junho/27": 8000.0,
+    "Julho/27": 8000.0
+   }
+  },
+  {
+   "oQueE": "LANÇAMENTOS NACIONAIS",
+   "tipo": "MENSAL",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "DIVERSOS VARIÁVEL",
+   "detalhe": "BRASIL (supermercado, roupas, lazer, remedios, medicos)",
+   "euro": null,
+   "vals": {
+    "Julho/26": 3000.0,
+    "Agosto/26": 3000.0,
+    "Setembro/26": 3000.0,
+    "Outubro/26": 3000.0,
+    "Novembro/26": 3000.0,
+    "Dezembro/26": 3000.0,
+    "Janeiro/27": 3000.0,
+    "Fevereiro/27": 3000.0,
+    "Março/27": 3000.0,
+    "Abril/27": 3000.0,
+    "Maio/27": 3000.0,
+    "Junho/27": 3000.0,
+    "Julho/27": 3000.0
+   }
+  },
+  {
+   "oQueE": "SMILES",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "DIVERSOS VARIÁVEL",
+   "detalhe": "ASSINATURA",
+   "euro": null,
+   "vals": {
+    "Julho/26": 37.8,
+    "Agosto/26": 37.8,
+    "Setembro/26": 37.8
+   }
+  },
+  {
+   "oQueE": "LIVELO",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA",
+   "euro": null,
+   "vals": {
+    "Julho/26": 95.88,
+    "Agosto/26": 95.88,
+    "Setembro/26": 95.88,
+    "Outubro/26": 95.88,
+    "Novembro/26": 95.88,
+    "Dezembro/26": 95.88,
+    "Janeiro/27": 95.88
+   }
+  },
+  {
+   "oQueE": "GLOBO PREMIERE",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "DIVERSOS VARIÁVEL",
+   "detalhe": "ASSINATURA",
+   "euro": null,
+   "vals": {
+    "Julho/26": 37.8,
+    "Agosto/26": 37.8,
+    "Setembro/26": 37.8
+   }
+  },
+  {
+   "oQueE": "AUTHENTIC FEET OSCAR F",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "DIVERSOS VARIÁVEL",
+   "detalhe": "ROUPAS E BEAUTY",
+   "euro": null,
+   "vals": {
+    "Julho/26": 199.99,
+    "Agosto/26": 199.99,
+    "Setembro/26": 199.99,
+    "Outubro/26": 199.99,
+    "Novembro/26": 199.99
+   }
+  },
+  {
+   "oQueE": "MP*ATITUDECOSMET",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "DIVERSOS VARIÁVEL",
+   "detalhe": "ROUPAS E BEAUTY",
+   "euro": null,
+   "vals": {
+    "Julho/26": 32.24
+   }
+  },
+  {
+   "oQueE": "ARTWALK OSCAR FREIRE",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "DIVERSOS VARIÁVEL",
+   "detalhe": "ROUPAS E BEAUTY",
+   "euro": null,
+   "vals": {
+    "Julho/26": 42.49,
+    "Agosto/26": 42.49,
+    "Setembro/26": 42.49,
+    "Outubro/26": 42.49,
+    "Novembro/26": 42.49
+   }
+  },
+  {
+   "oQueE": "MP*14PRODUTOS",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA AP",
+   "euro": null,
+   "vals": {
+    "Julho/26": 61.39,
+    "Agosto/26": 61.39,
+    "Setembro/26": 61.39,
+    "Outubro/26": 61.39,
+    "Novembro/26": 61.39,
+    "Dezembro/26": 61.39,
+    "Janeiro/27": 61.39
+   }
+  },
+  {
+   "oQueE": "MP*14PRODUTOS",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA AP",
+   "euro": null,
+   "vals": {
+    "Julho/26": 80.43,
+    "Agosto/26": 80.43,
+    "Setembro/26": 80.43,
+    "Outubro/26": 80.43,
+    "Novembro/26": 80.43,
+    "Dezembro/26": 80.43,
+    "Janeiro/27": 80.43
+   }
+  },
+  {
+   "oQueE": "MP*3PRODUTOS",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA AP",
+   "euro": null,
+   "vals": {
+    "Julho/26": 31.66
+   }
+  },
+  {
+   "oQueE": "MP2 PRODUTOS",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA AP",
+   "euro": null,
+   "vals": {
+    "Julho/26": 126.12,
+    "Agosto/26": 126.12,
+    "Setembro/26": 126.12,
+    "Outubro/26": 126.12,
+    "Novembro/26": 126.12,
+    "Dezembro/26": 126.12,
+    "Janeiro/27": 126.12
+   }
+  },
+  {
+   "oQueE": "ZP *ANA PAULA ORGANIZE",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA AP",
+   "euro": null,
+   "vals": {
+    "Julho/26": 1380.0
+   }
+  },
+  {
+   "oQueE": "PG *LEROY MERLIN",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA AP",
+   "euro": null,
+   "vals": {
+    "Julho/26": 1300.64,
+    "Agosto/26": 1300.64,
+    "Setembro/26": 1300.64
+   }
+  },
+  {
+   "oQueE": "MadeiraMadeira",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA AP",
+   "euro": null,
+   "vals": {
+    "Julho/26": 1296.6,
+    "Agosto/26": 1296.6,
+    "Setembro/26": 1296.6,
+    "Outubro/26": 1296.6,
+    "Novembro/26": 1296.6
+   }
+  },
+  {
+   "oQueE": "LEROY MERLIN",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA AP",
+   "euro": null,
+   "vals": {
+    "Julho/26": 1271.56
+   }
+  },
+  {
+   "oQueE": "MM*DISTRIBUID",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA AP",
+   "euro": null,
+   "vals": {
+    "Julho/26": 337.36,
+    "Agosto/26": 337.36,
+    "Setembro/26": 337.36,
+    "Outubro/26": 337.36,
+    "Novembro/26": 337.36,
+    "Dezembro/26": 337.36
+   }
+  },
+  {
+   "oQueE": "PARCELAMENTO CARTÃO 1",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "DIVIDA",
+   "detalhe": "CARTÃO",
+   "euro": null,
+   "vals": {
+    "Julho/26": 1579.93,
+    "Agosto/26": 1579.93,
+    "Setembro/26": 1579.93,
+    "Outubro/26": 1579.93,
+    "Novembro/26": 1579.93,
+    "Dezembro/26": 1579.93
+   }
+  },
+  {
+   "oQueE": "JUROS SOBRE PARCELADO 1",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "DIVIDA",
+   "detalhe": "CARTÃO",
+   "euro": null,
+   "vals": {
+    "Julho/26": 1508.07,
+    "Agosto/26": 1508.07,
+    "Setembro/26": 1508.07,
+    "Outubro/26": 1508.07,
+    "Novembro/26": 1508.07,
+    "Dezembro/26": 1508.07
+   }
+  },
+  {
+   "oQueE": "IOF PARCELAMENTO 1",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "DIVIDA",
+   "detalhe": "CARTÃO",
+   "euro": null,
+   "vals": {}
+  },
+  {
+   "oQueE": "PARCELAMENTO CARTÃO 2",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "DIVIDA",
+   "detalhe": "CARTÃO",
+   "euro": null,
+   "vals": {
+    "Julho/26": 3216.02,
+    "Agosto/26": 3216.02,
+    "Setembro/26": 3216.02,
+    "Outubro/26": 3216.02,
+    "Novembro/26": 3216.02,
+    "Dezembro/26": 3216.02,
+    "Janeiro/27": 3216.02,
+    "Fevereiro/27": 3216.02,
+    "Março/27": 3216.02
+   }
+  },
+  {
+   "oQueE": "JUROS SOBRE PARCELADO 2",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "DIVIDA",
+   "detalhe": "CARTÃO",
+   "euro": null,
+   "vals": {
+    "Julho/26": 4371.25,
+    "Agosto/26": 4371.25,
+    "Setembro/26": 4371.25,
+    "Outubro/26": 4371.25,
+    "Novembro/26": 4371.25,
+    "Dezembro/26": 4371.25,
+    "Janeiro/27": 4371.25,
+    "Fevereiro/27": 4371.25,
+    "Março/27": 4371.25
+   }
+  },
+  {
+   "oQueE": "IOF PARCELAMENTO 2",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "DIVIDA",
+   "detalhe": "CARTÃO",
+   "euro": null,
+   "vals": {}
+  },
+  {
+   "oQueE": "Esplanada Moveis",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA",
+   "euro": null,
+   "vals": {
+    "Julho/26": 123.16,
+    "Agosto/26": 123.16,
+    "Setembro/26": 123.16,
+    "Outubro/26": 123.16,
+    "Novembro/26": 123.16,
+    "Dezembro/26": 123.16,
+    "Janeiro/27": 123.16,
+    "Fevereiro/27": 123.16,
+    "Março/27": 123.16
+   }
+  },
+  {
+   "oQueE": "Pauli Textil",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA",
+   "euro": null,
+   "vals": {
+    "Julho/26": 60.32,
+    "Agosto/26": 60.32,
+    "Setembro/26": 60.32
+   }
+  },
+  {
+   "oQueE": "MadeiraMadeira",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA",
+   "euro": null,
+   "vals": {
+    "Julho/26": 277.48,
+    "Agosto/26": 277.48,
+    "Setembro/26": 277.48,
+    "Outubro/26": 277.48,
+    "Novembro/26": 277.48
+   }
+  },
+  {
+   "oQueE": "CONDOMINIO",
+   "tipo": "MENSAL",
+   "fonte": "DÉBITO ITAÚ",
+   "categoria": "MÃE",
+   "detalhe": "AP",
+   "euro": null,
+   "vals": {
+    "Julho/26": 1030.0,
+    "Agosto/26": 1030.0,
+    "Setembro/26": 1030.0,
+    "Outubro/26": 1030.0,
+    "Novembro/26": 1030.0,
+    "Dezembro/26": 1030.0,
+    "Janeiro/27": 1030.0,
+    "Fevereiro/27": 1030.0,
+    "Março/27": 1030.0,
+    "Abril/27": 1030.0,
+    "Maio/27": 1030.0,
+    "Junho/27": 1030.0,
+    "Julho/27": 1030.0
+   }
+  },
+  {
+   "oQueE": "CONDOMINIO",
+   "tipo": "MENSAL",
+   "fonte": "DÉBITO ITAÚ",
+   "categoria": "MÃE",
+   "detalhe": "AP ATRASADO",
+   "euro": null,
+   "vals": {
+    "Julho/26": 2400.0
+   }
+  },
+  {
+   "oQueE": "LIMPEZA",
+   "tipo": "MENSAL",
+   "fonte": "DÉBITO ITAÚ",
+   "categoria": "MÃE",
+   "detalhe": "DOMESTICA",
+   "euro": null,
+   "vals": {
+    "Julho/26": 3250.0,
+    "Agosto/26": 3250.0,
+    "Setembro/26": 3250.0,
+    "Outubro/26": 3250.0,
+    "Novembro/26": 3250.0,
+    "Dezembro/26": 3250.0,
+    "Janeiro/27": 3250.0,
+    "Fevereiro/27": 3250.0,
+    "Março/27": 3250.0,
+    "Abril/27": 3250.0,
+    "Maio/27": 3250.0,
+    "Junho/27": 3250.0,
+    "Julho/27": 3250.0
+   }
+  },
+  {
+   "oQueE": "DIA A DIA",
+   "tipo": "MENSAL",
+   "fonte": "DÉBITO ITAÚ",
+   "categoria": "MÃE",
+   "detalhe": "NUBANK CARTÃO",
+   "euro": null,
+   "vals": {
+    "Julho/26": 3000.0,
+    "Agosto/26": 3000.0,
+    "Setembro/26": 3000.0,
+    "Outubro/26": 3000.0,
+    "Novembro/26": 3000.0,
+    "Dezembro/26": 3000.0,
+    "Janeiro/27": 3000.0,
+    "Fevereiro/27": 3000.0,
+    "Março/27": 3000.0,
+    "Abril/27": 3000.0,
+    "Maio/27": 3000.0,
+    "Junho/27": 3000.0,
+    "Julho/27": 3000.0
+   }
+  },
+  {
+   "oQueE": "ALUGUEL",
+   "tipo": "MENSAL",
+   "fonte": "DÉBITO SANTANDER PT",
+   "categoria": "FIXOS",
+   "detalhe": "PORTUGAL",
+   "euro": 3400.0,
+   "vals": {
+    "Julho/26": 20974.06,
+    "Agosto/26": 20974.06,
+    "Setembro/26": 20974.06,
+    "Outubro/26": 20974.06,
+    "Novembro/26": 20974.06,
+    "Dezembro/26": 20974.06,
+    "Janeiro/27": 20974.06,
+    "Fevereiro/27": 20974.06,
+    "Março/27": 20974.06,
+    "Abril/27": 20974.06,
+    "Maio/27": 20974.06,
+    "Junho/27": 20974.06,
+    "Julho/27": 20974.06
+   }
+  },
+  {
+   "oQueE": "ESCOLA",
+   "tipo": "MENSAL",
+   "fonte": "DÉBITO SANTANDER PT",
+   "categoria": "FIXOS",
+   "detalhe": "PORTUGAL",
+   "euro": 2150.0,
+   "vals": {
+    "Julho/26": 13263.01,
+    "Agosto/26": 13263.01,
+    "Setembro/26": 13263.01,
+    "Outubro/26": 13263.01,
+    "Novembro/26": 13263.01,
+    "Dezembro/26": 13263.01,
+    "Janeiro/27": 13263.01,
+    "Fevereiro/27": 13263.01,
+    "Março/27": 13263.01,
+    "Abril/27": 13263.01,
+    "Maio/27": 13263.01,
+    "Junho/27": 13263.01,
+    "Julho/27": 13263.01
+   }
+  },
+  {
+   "oQueE": "ESCOLA EXTRAS",
+   "tipo": "MENSAL",
+   "fonte": "DÉBITO SANTANDER PT",
+   "categoria": "FIXOS",
+   "detalhe": "PORTUGAL",
+   "euro": 400.0,
+   "vals": {
+    "Julho/26": 2467.54,
+    "Agosto/26": 2467.54,
+    "Setembro/26": 2467.54,
+    "Outubro/26": 2467.54,
+    "Novembro/26": 2467.54,
+    "Dezembro/26": 2467.54,
+    "Janeiro/27": 2467.54,
+    "Fevereiro/27": 2467.54,
+    "Março/27": 2467.54,
+    "Abril/27": 2467.54,
+    "Maio/27": 2467.54,
+    "Junho/27": 2467.54,
+    "Julho/27": 2467.54
+   }
+  },
+  {
+   "oQueE": "CONTADOR",
+   "tipo": "MENSAL",
+   "fonte": "DÉBITO ITAÚ",
+   "categoria": "FIXOS",
+   "detalhe": "FLAVIA",
+   "euro": null,
+   "vals": {
+    "Julho/26": 120.0,
+    "Agosto/26": 120.0,
+    "Setembro/26": 120.0,
+    "Outubro/26": 120.0,
+    "Novembro/26": 120.0,
+    "Dezembro/26": 120.0,
+    "Janeiro/27": 120.0,
+    "Fevereiro/27": 120.0,
+    "Março/27": 120.0,
+    "Abril/27": 120.0,
+    "Maio/27": 120.0,
+    "Junho/27": 120.0,
+    "Julho/27": 120.0
+   }
+  },
+  {
+   "oQueE": "CARRO",
+   "tipo": "MENSAL",
+   "fonte": "DÉBITO SANTANDER PT",
+   "categoria": "FIXOS",
+   "detalhe": "PORTUGAL",
+   "euro": 700.0,
+   "vals": {
+    "Junho/26": 2467.54,
+    "Julho/26": 4318.19,
+    "Agosto/26": 4318.19,
+    "Setembro/26": 4318.19,
+    "Outubro/26": 4318.19,
+    "Novembro/26": 4318.19,
+    "Dezembro/26": 4318.19,
+    "Janeiro/27": 4318.19,
+    "Fevereiro/27": 4318.19,
+    "Março/27": 4318.19,
+    "Abril/27": 4318.19,
+    "Maio/27": 4318.19,
+    "Junho/27": 4318.19,
+    "Julho/27": 4318.19
+   }
+  },
+  {
+   "oQueE": "CARRO",
+   "tipo": "MENSAL",
+   "fonte": "DÉBITO SANTANDER PT",
+   "categoria": "FIXOS",
+   "detalhe": "PORTUGAL",
+   "euro": 300.0,
+   "vals": {
+    "Julho/26": 1850.65
+   }
+  },
+  {
+   "oQueE": "LIMPEZA",
+   "tipo": "MENSAL",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "FIXOS",
+   "detalhe": "PORTUGAL",
+   "euro": 260.0,
+   "vals": {
+    "Julho/26": 1603.9,
+    "Agosto/26": 1603.9,
+    "Setembro/26": 1603.9,
+    "Outubro/26": 1603.9,
+    "Novembro/26": 1603.9,
+    "Dezembro/26": 1603.9,
+    "Janeiro/27": 1603.9,
+    "Fevereiro/27": 1603.9,
+    "Março/27": 1603.9,
+    "Abril/27": 1603.9,
+    "Maio/27": 1603.9,
+    "Junho/27": 1603.9,
+    "Julho/27": 1603.9
+   }
+  },
+  {
+   "oQueE": "AGUA, GAS, LUZ",
+   "tipo": "MENSAL",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "FIXOS",
+   "detalhe": "PORTUGAL",
+   "euro": 240.0,
+   "vals": {
+    "Julho/26": 1480.52,
+    "Agosto/26": 1480.52,
+    "Setembro/26": 1480.52,
+    "Outubro/26": 1480.52,
+    "Novembro/26": 1480.52,
+    "Dezembro/26": 1480.52,
+    "Janeiro/27": 1480.52,
+    "Fevereiro/27": 1480.52,
+    "Março/27": 1480.52,
+    "Abril/27": 1480.52,
+    "Maio/27": 1480.52,
+    "Junho/27": 1480.52,
+    "Julho/27": 1480.52
+   }
+  },
+  {
+   "oQueE": "CONSULTORIA",
+   "tipo": "MENSAL",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "DIVERSOS VARIÁVEL",
+   "detalhe": "SABRINA",
+   "euro": null,
+   "vals": {
+    "Julho/26": 2000.0,
+    "Agosto/26": 2000.0,
+    "Setembro/26": 2000.0,
+    "Outubro/26": 2000.0,
+    "Novembro/26": 2000.0,
+    "Dezembro/26": 2000.0,
+    "Janeiro/27": 2000.0,
+    "Fevereiro/27": 2000.0,
+    "Março/27": 2000.0,
+    "Abril/27": 2000.0,
+    "Maio/27": 2000.0,
+    "Junho/27": 2000.0,
+    "Julho/27": 2000.0
+   }
+  },
+  {
+   "oQueE": "CONSULTORIA",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "DIVERSOS VARIÁVEL",
+   "detalhe": "SABRINA ATRASADO",
+   "euro": null,
+   "vals": {
+    "Junho/26": 2513.32,
+    "Julho/26": 2513.32
+   }
+  },
+  {
+   "oQueE": "CONSULTORIA",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO BRADESCO",
+   "categoria": "DIVIDA",
+   "detalhe": "SABRINA ATRASADO",
+   "euro": null,
+   "vals": {}
+  },
+  {
+   "oQueE": "CIDA",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "DIVIDA",
+   "detalhe": "CIDA",
+   "euro": null,
+   "vals": {
+    "Junho/26": 955.57,
+    "Julho/26": 955.57,
+    "Agosto/26": 955.57
+   }
+  },
+  {
+   "oQueE": "CASA ALPHAVILLE (2)",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA",
+   "euro": null,
+   "vals": {
+    "Junho/26": 1525.03,
+    "Julho/26": 1525.03,
+    "Agosto/26": 1525.03,
+    "Setembro/26": 1525.03,
+    "Outubro/26": 1525.03,
+    "Novembro/26": 1525.03,
+    "Dezembro/26": 1525.03
+   }
+  },
+  {
+   "oQueE": "COINBASE 4",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "DIVIDA",
+   "detalhe": "AMORTIZAÇÃO",
+   "euro": null,
+   "vals": {
+    "Junho/26": 1026.23,
+    "Julho/26": 1026.23,
+    "Agosto/26": 1026.23,
+    "Setembro/26": 1026.23,
+    "Outubro/26": 1026.23
+   }
+  },
+  {
+   "oQueE": "COINBASE 5",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "DIVIDA",
+   "detalhe": "AMORTIZAÇÃO",
+   "euro": null,
+   "vals": {
+    "Junho/26": 1184.11,
+    "Julho/26": 1184.11,
+    "Agosto/26": 1184.11,
+    "Setembro/26": 1184.11,
+    "Outubro/26": 1184.11
+   }
+  },
+  {
+   "oQueE": "JORGE REIS",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "DIVERSOS VARIÁVEL",
+   "detalhe": "REMEDIO",
+   "euro": null,
+   "vals": {
+    "Junho/26": 628.34
+   }
+  },
+  {
+   "oQueE": "KIWIFY",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "DIVERSOS VARIÁVEL",
+   "detalhe": "ASSINATURA",
+   "euro": null,
+   "vals": {
+    "Junho/26": 20.42,
+    "Julho/26": 20.42,
+    "Agosto/26": 20.42,
+    "Setembro/26": 20.42,
+    "Outubro/26": 20.42,
+    "Novembro/26": 20.42,
+    "Dezembro/26": 20.42,
+    "Janeiro/27": 20.42,
+    "Fevereiro/27": 20.42,
+    "Março/27": 20.42
+   }
+  },
+  {
+   "oQueE": "MERCADO LIVRE",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA",
+   "euro": null,
+   "vals": {
+    "Junho/26": 55.8,
+    "Julho/26": 55.8,
+    "Agosto/26": 55.8,
+    "Setembro/26": 55.8
+   }
+  },
+  {
+   "oQueE": "MERCADO LIVRE",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA",
+   "euro": null,
+   "vals": {
+    "Junho/26": 36.28,
+    "Julho/26": 36.28,
+    "Agosto/26": 36.28,
+    "Setembro/26": 36.28,
+    "Outubro/26": 36.28,
+    "Novembro/26": 36.28,
+    "Dezembro/26": 36.28
+   }
+  },
+  {
+   "oQueE": "PARCELAMENTO FATURA ITAÚ",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "DIVIDA",
+   "detalhe": "FATURA 4X",
+   "euro": null,
+   "vals": {
+    "Junho/26": 6018.35,
+    "Julho/26": 7396.62,
+    "Agosto/26": 7396.62,
+    "Setembro/26": 7396.62,
+    "Outubro/26": 7396.62
+   }
+  },
+  {
+   "oQueE": "COINBASE 1",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "DIVIDA",
+   "detalhe": "AMORTIZAÇÃO",
+   "euro": null,
+   "vals": {
+    "Junho/26": 750.05,
+    "Julho/26": 750.05,
+    "Agosto/26": 750.05
+   }
+  },
+  {
+   "oQueE": "COINBASE 2",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "DIVIDA",
+   "detalhe": "AMORTIZAÇÃO",
+   "euro": null,
+   "vals": {
+    "Junho/26": 686.52,
+    "Julho/26": 686.52,
+    "Agosto/26": 686.52
+   }
+  },
+  {
+   "oQueE": "COINBASE 3",
+   "tipo": "PARCELADO",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "DIVIDA",
+   "detalhe": "AMORTIZAÇÃO",
+   "euro": null,
+   "vals": {
+    "Junho/26": 1376.16,
+    "Julho/26": 1376.16,
+    "Agosto/26": 1376.16
+   }
+  },
+  {
+   "oQueE": "LANÇAMENTOS NACIONAIS",
+   "tipo": "MENSAL",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "DIVERSOS VARIÁVEL",
+   "detalhe": "BRASIL (supermercado, roupas, lazer, remedios, medicos)",
+   "euro": null,
+   "vals": {
+    "Junho/26": 1213.02,
+    "Julho/26": 1000.0,
+    "Agosto/26": 1000.0,
+    "Setembro/26": 1000.0,
+    "Outubro/26": 1000.0,
+    "Novembro/26": 1000.0,
+    "Dezembro/26": 1000.0,
+    "Janeiro/27": 1000.0,
+    "Fevereiro/27": 1000.0,
+    "Março/27": 1000.0,
+    "Abril/27": 1000.0,
+    "Maio/27": 1000.0,
+    "Junho/27": 1000.0,
+    "Julho/27": 1000.0
+   }
+  },
+  {
+   "oQueE": "LANÇAMENTOS INTERNACIONAIS",
+   "tipo": "MENSAL",
+   "fonte": "CARTÃO ITAÚ",
+   "categoria": "DIVERSOS VARIÁVEL",
+   "detalhe": "PORTUGAL (iof, supermercado, roupas, lazer, remedios, medicos)",
+   "euro": null,
+   "vals": {
+    "Junho/26": 9600.0,
+    "Julho/26": 5000.0,
+    "Agosto/26": 5000.0,
+    "Setembro/26": 5000.0,
+    "Outubro/26": 5000.0,
+    "Novembro/26": 5000.0,
+    "Dezembro/26": 5000.0,
+    "Janeiro/27": 5000.0,
+    "Fevereiro/27": 5000.0,
+    "Março/27": 5000.0,
+    "Abril/27": 5000.0,
+    "Maio/27": 5000.0,
+    "Junho/27": 5000.0,
+    "Julho/27": 5000.0
+   }
+  },
+  {
+   "oQueE": "BRADESCO",
+   "tipo": "PARCELADO",
+   "fonte": "DÉBITO BRADESCO",
+   "categoria": "DIVIDA",
+   "detalhe": "CREDITO",
+   "euro": null,
+   "vals": {
+    "Julho/26": 1238.97,
+    "Agosto/26": 1238.97,
+    "Setembro/26": 1238.97,
+    "Outubro/26": 1238.97,
+    "Novembro/26": 1238.97,
+    "Dezembro/26": 1238.97,
+    "Janeiro/27": 1238.97,
+    "Fevereiro/27": 1238.97,
+    "Março/27": 1238.97,
+    "Abril/27": 1238.97,
+    "Maio/27": 1238.97,
+    "Junho/27": 1238.97,
+    "Julho/27": 1238.97
+   }
+  },
+  {
+   "oQueE": "IMPOSTO",
+   "tipo": "PARCELADO",
+   "fonte": "DÉBITO ITAÚ",
+   "categoria": "DIVIDA",
+   "detalhe": "IMPOSTO",
+   "euro": null,
+   "vals": {
+    "Julho/26": 1889.0,
+    "Agosto/26": 1889.0,
+    "Setembro/26": 1889.0,
+    "Outubro/26": 1889.0,
+    "Novembro/26": 1889.0,
+    "Dezembro/26": 1889.0,
+    "Janeiro/27": 1889.0,
+    "Fevereiro/27": 1889.0,
+    "Março/27": 1889.0,
+    "Abril/27": 1889.0,
+    "Maio/27": 1889.0,
+    "Junho/27": 1889.0,
+    "Julho/27": 1889.0
+   }
+  },
+  {
+   "oQueE": "CIDA 1",
+   "tipo": "PARCELADO",
+   "fonte": "DÉBITO ITAÚ",
+   "categoria": "DIVIDA",
+   "detalhe": "CIDA",
+   "euro": null,
+   "vals": {
+    "Junho/26": 1950.0,
+    "Julho/26": 1950.0,
+    "Agosto/26": 1950.0,
+    "Setembro/26": 1950.0,
+    "Outubro/26": 1950.0,
+    "Novembro/26": 1950.0,
+    "Dezembro/26": 1950.0,
+    "Janeiro/27": 1950.0,
+    "Fevereiro/27": 1950.0,
+    "Março/27": 1950.0,
+    "Abril/27": 1950.0,
+    "Maio/27": 1950.0,
+    "Junho/27": 1950.0,
+    "Julho/27": 1950.0
+   }
+  },
+  {
+   "oQueE": "ITAÚ",
+   "tipo": "PARCELADO",
+   "fonte": "DÉBITO ITAÚ",
+   "categoria": "DIVIDA",
+   "detalhe": "CRÉDITO",
+   "euro": null,
+   "vals": {
+    "Julho/26": 3689.0,
+    "Agosto/26": 3689.0,
+    "Setembro/26": 3689.0,
+    "Outubro/26": 3689.0,
+    "Novembro/26": 3689.0,
+    "Dezembro/26": 3689.0,
+    "Janeiro/27": 3689.0,
+    "Fevereiro/27": 3689.0,
+    "Março/27": 3689.0,
+    "Abril/27": 3689.0,
+    "Maio/27": 3689.0,
+    "Junho/27": 3689.0,
+    "Julho/27": 3689.0
+   }
+  },
+  {
+   "oQueE": "ITAÚ",
+   "tipo": "MENSAL",
+   "fonte": "DÉBITO ITAÚ",
+   "categoria": "DIVIDA",
+   "detalhe": "CHEQUE ESPECIAL",
+   "euro": null,
+   "vals": {
+    "Julho/26": 2181.0,
+    "Agosto/26": 2181.0,
+    "Setembro/26": 2181.0,
+    "Outubro/26": 2181.0,
+    "Novembro/26": 2181.0,
+    "Dezembro/26": 2181.0,
+    "Janeiro/27": 2181.0,
+    "Fevereiro/27": 2181.0,
+    "Março/27": 2181.0,
+    "Abril/27": 2181.0,
+    "Maio/27": 2181.0,
+    "Junho/27": 2181.0,
+    "Julho/27": 2181.0
+   }
+  },
+  {
+   "oQueE": "ITAÚ FLAVIA",
+   "tipo": "PARCELADO",
+   "fonte": "DÉBITO ITAÚ FLAVIA",
+   "categoria": "DIVIDA",
+   "detalhe": "CRÉDITO",
+   "euro": null,
+   "vals": {
+    "Julho/26": 1869.0,
+    "Agosto/26": 1869.0,
+    "Setembro/26": 1869.0,
+    "Outubro/26": 1869.0,
+    "Novembro/26": 1869.0,
+    "Dezembro/26": 1869.0,
+    "Janeiro/27": 1869.0,
+    "Fevereiro/27": 1869.0,
+    "Março/27": 1869.0,
+    "Abril/27": 1869.0,
+    "Maio/27": 1869.0,
+    "Junho/27": 1869.0,
+    "Julho/27": 1869.0
+   }
+  },
+  {
+   "oQueE": "ITAÚ FLAVIA",
+   "tipo": "PARCELADO",
+   "fonte": "DÉBITO ITAÚ FLAVIA",
+   "categoria": "DIVIDA",
+   "detalhe": "CARTÃO",
+   "euro": null,
+   "vals": {
+    "Julho/26": 497.08,
+    "Agosto/26": 497.08,
+    "Setembro/26": 497.08,
+    "Outubro/26": 497.08,
+    "Novembro/26": 497.08,
+    "Dezembro/26": 497.08,
+    "Janeiro/27": 497.08,
+    "Fevereiro/27": 497.08,
+    "Março/27": 497.08,
+    "Abril/27": 497.08,
+    "Maio/27": 497.08,
+    "Junho/27": 497.08,
+    "Julho/27": 497.08
+   }
+  },
+  {
+   "oQueE": "ITAÚ FLAVIA",
+   "tipo": "A VISTA",
+   "fonte": "DÉBITO ITAÚ FLAVIA",
+   "categoria": "DIVIDA",
+   "detalhe": "PARCELAS ATRASADAS CARTAO E CREDITO",
+   "euro": null,
+   "vals": {}
+  },
+  {
+   "oQueE": "CARRO",
+   "tipo": "A VISTA",
+   "fonte": "DÉBITO SANTANDER PT",
+   "categoria": "EXTRAS",
+   "detalhe": "CONSERTO DO CARRO",
+   "euro": null,
+   "vals": {}
+  },
+  {
+   "oQueE": "HOSPITAL LUSIADAS",
+   "tipo": "A VISTA",
+   "fonte": "DÉBITO SANTANDER PT",
+   "categoria": "EXTRAS",
+   "detalhe": "CONSULTA FLAVIA",
+   "euro": null,
+   "vals": {}
+  },
+  {
+   "oQueE": "HOSPITAL LUSIADAS",
+   "tipo": "A VISTA",
+   "fonte": "DÉBITO SANTANDER PT",
+   "categoria": "EXTRAS",
+   "detalhe": "FLAVIA",
+   "euro": null,
+   "vals": {}
+  },
+  {
+   "oQueE": "ESCOLA",
+   "tipo": "A VISTA",
+   "fonte": "DÉBITO SANTANDER PT",
+   "categoria": "EXTRAS",
+   "detalhe": "MATRICULA 2026-2027",
+   "euro": null,
+   "vals": {}
+  },
+  {
+   "oQueE": "CIDA 2",
+   "tipo": "PARCELADO",
+   "fonte": "DÉBITO ITAÚ",
+   "categoria": "DIVIDA",
+   "detalhe": "EMPRESTIMO DA CIDA",
+   "euro": null,
+   "vals": {
+    "Junho/26": 1335.0,
+    "Julho/26": 3835.0,
+    "Agosto/26": 3835.0,
+    "Setembro/26": 3835.0,
+    "Outubro/26": 3835.0,
+    "Novembro/26": 3835.0,
+    "Dezembro/26": 3835.0,
+    "Janeiro/27": 3835.0
+   }
+  },
+  {
+   "oQueE": "CASA ALPHAVILLE (3)",
+   "tipo": "PARCELADO",
+   "fonte": "DÉBITO ITAÚ",
+   "categoria": "REFORMA MÃE",
+   "detalhe": "REFORMA ATRASADA MÃE",
+   "euro": null,
+   "vals": {
+    "Julho/26": 9300.0
+   }
+  }
+ ],
+ "dividas": [
+  {
+   "quem": "Nelsinho",
+   "nome": "Bradesco",
+   "principal": 55821.78,
+   "jurosMensal": 0.0099,
+   "tempo": "60 MESES",
+   "amortiza": "SIM",
+   "parcela": 1239
+  },
+  {
+   "quem": "Nelsinho",
+   "nome": "Imposto",
+   "principal": 107388.12,
+   "jurosMensal": 0.0107,
+   "tempo": "60 meses",
+   "amortiza": "SIM",
+   "parcela": 1889
+  },
+  {
+   "quem": "Nelsinho",
+   "nome": "Cida (1)",
+   "principal": 170000,
+   "jurosMensal": 0.01,
+   "tempo": "INDEFINIDO",
+   "amortiza": "NÃO",
+   "parcela": 1950
+  },
+  {
+   "quem": "Nelsinho",
+   "nome": "Cida (2)",
+   "principal": 28810,
+   "jurosMensal": 0,
+   "tempo": "7 MESES",
+   "amortiza": "NÃO",
+   "parcela": 3835
+  },
+  {
+   "quem": "Nelsinho",
+   "nome": "Itau",
+   "principal": 93373,
+   "jurosMensal": 0.032,
+   "tempo": "40 MESES",
+   "amortiza": "SIM",
+   "parcela": 1689
+  },
+  {
+   "quem": "Nelsinho",
+   "nome": "Cheque Especial",
+   "principal": 31000,
+   "jurosMensal": 0.07,
+   "tempo": "INDEFINIDO",
+   "amortiza": "NÃO",
+   "parcela": 2181
+  },
+  {
+   "quem": "Nelsinho",
+   "nome": "Cartão Bradesco 1",
+   "principal": null,
+   "jurosMensal": 0.1,
+   "tempo": "7 MESES",
+   "amortiza": "SIM",
+   "parcela": 3118
+  },
+  {
+   "quem": "Nelsinho",
+   "nome": "Cartão Bradesco 2",
+   "principal": 39341.25,
+   "jurosMensal": 0.1,
+   "tempo": "9 MESES",
+   "amortiza": "SIM",
+   "parcela": 7636
+  },
+  {
+   "quem": "Flavia",
+   "nome": "Itau",
+   "principal": 78861,
+   "jurosMensal": 0.0115,
+   "tempo": "60 meses",
+   "amortiza": "sim",
+   "parcela": 1869.13
+  },
+  {
+   "quem": "Flavia",
+   "nome": "Itau Cartão",
+   "principal": 21341.59,
+   "jurosMensal": 0.011,
+   "tempo": "36 meses ",
+   "amortiza": "sim",
+   "parcela": 640
+  }
+ ],
+ "tipos": [
+  "A VISTA",
+  "MENSAL",
+  "PARCELADO"
+ ],
+ "fontes": [
+  "CARTÃO BRADESCO",
+  "CARTÃO ITAÚ",
+  "DÉBITO BRADESCO",
+  "DÉBITO ITAÚ",
+  "DÉBITO ITAÚ FLAVIA",
+  "DÉBITO SANTANDER PT"
+ ],
+ "categorias": [
+  "DIVERSOS VARIÁVEL",
+  "DIVIDA",
+  "EXTRAS",
+  "FIXOS",
+  "MÃE",
+  "REFORMA MÃE"
+ ]
+};
+const API_URL = "https://jibstoejwfvpzlhymoxe.supabase.co/functions/v1/nelsinho-contas";
+const API_KEY = "sb_publishable_w9nWYDidv97rPdMxmFEO_g_JJnKFtbO";
+const FONTE_META = {
+  "CARTÃO ITAÚ":{tipo:"Fatura",vence:"dia 25"},
+  "CARTÃO BRADESCO":{tipo:"Fatura",vence:"dia 5"},
+  "DÉBITO ITAÚ":{tipo:"Débito",vence:"—"},
+  "DÉBITO ITAÚ FLAVIA":{tipo:"Débito",vence:"—"},
+  "DÉBITO SANTANDER PT":{tipo:"Débito",vence:"1ª semana"},
+  "DÉBITO BRADESCO":{tipo:"Débito",vence:"—"}
+};
+const CACHE="nelsinho_contas_cache_v1", PKEY="nelsinho_contas_pass";
+const fmt=n=>n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const money=n=>"R$ "+fmt(n||0);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
+let S=null, PASS=localStorage.getItem(PKEY)||null;
+
+/* ---------- API ---------- */
+async function api(action, extra){
+  const r=await fetch(API_URL,{method:'POST',headers:{
+    'apikey':API_KEY,'Authorization':'Bearer '+API_KEY,'content-type':'application/json'},
+    body:JSON.stringify(Object.assign({action,pass:PASS},extra||{}))});
+  let j={}; try{j=await r.json();}catch(e){}
+  if(!r.ok) throw new Error(j.error||('Erro '+r.status));
+  return j;
+}
+
+/* ---------- STATE ---------- */
+function seedState(){
+  const entries=SEED.entries.map(e=>({id:uid(),oQueE:e.oQueE,tipo:e.tipo,fonte:e.fonte,
+    categoria:e.categoria,detalhe:e.detalhe,euro:e.euro,vals:e.vals,paid:{}}));
+  return {rate:SEED.rate,rendaFixa:SEED.rendaFixa,months:SEED.months,fontes:SEED.fontes,
+    categorias:SEED.categorias,tipos:SEED.tipos,fonteMeta:JSON.parse(JSON.stringify(FONTE_META)),
+    dividas:SEED.dividas,entries,view:"controle",month:SEED.months[0]};
+}
+function cacheLocal(){try{localStorage.setItem(CACHE,JSON.stringify(S));}catch(e){}}
+
+let saveTimer=null, dirty=false;
+function save(){
+  cacheLocal(); dirty=true; setSync('saving');
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(pushCloud,800);
+}
+async function pushCloud(){
+  if(!dirty) return;
+  try{ await api('save',{data:S}); dirty=false; setSync('ok'); }
+  catch(e){ setSync('off'); }
+}
+function setSync(st){
+  const el=document.getElementById('sync'),t=document.getElementById('syncT');
+  if(!el)return; el.className='sync'+(st==='saving'?' saving':st==='off'?' off':'');
+  t.textContent=st==='saving'?'salvando…':st==='off'?'offline (salvo no aparelho)':'salvo na nuvem';
+}
+
+/* ---------- HELPERS ---------- */
+const monthsList=()=>S.months;
+function entriesOfMonth(m){return S.entries.filter(e=>e.vals[m]!=null);}
+function valOf(e,m){return e.vals[m]||0;}
+function isPaid(e,m){return !!(e.paid&&e.paid[m]);}
+function totalMonth(m){return entriesOfMonth(m).reduce((s,e)=>s+valOf(e,m),0);}
+function paidMonth(m){return entriesOfMonth(m).filter(e=>isPaid(e,m)).reduce((s,e)=>s+valOf(e,m),0);}
+const CATCOL={"FIXOS":"var(--fix)","DIVIDA":"var(--div)","MÃE":"var(--mae)","REFORMA MÃE":"var(--ref)","EXTRAS":"var(--ext)","DIVERSOS VARIÁVEL":"var(--var)"};
+const catColor=c=>CATCOL[c]||"var(--mut)";
+
+/* ---------- SHELL ---------- */
+const TABS=[["controle","CONTROLE"],["custos","CUSTOS"],["resumo","RESUMO"],["fonte","POR FONTE"],["progresso","PROGRESSO"],["dividas","DÍVIDAS"],["config","⚙"]];
+function renderShell(){
+  const sel=document.getElementById('mSel');
+  sel.innerHTML=monthsList().map(m=>`<option ${m===S.month?'selected':''}>${m}</option>`).join('');
+  document.getElementById('rendaTop').textContent=money(S.rendaFixa);
+  document.getElementById('tabs').innerHTML=TABS.map(([k,l])=>
+    `<button class="${k===S.view?'on':''}" data-tab="${k}">${l}</button>`).join('');
+  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{S.view=b.dataset.tab;save();render();});
+}
+let filt={q:"",fonte:"",cat:"",st:""};
+function render(){
+  renderShell();
+  document.getElementById('app').innerHTML=({controle:vControle,custos:vCustos,resumo:vResumo,fonte:vFonte,progresso:vProgresso,dividas:vDividas,config:vConfig}[S.view])();
+  if(S.view==='custos')wireCustos();
+  if(S.view==='config')wireConfig();
+}
+
+/* ---------- CONTROLE ---------- */
+function vControle(){
+  const m=S.month, tot=totalMonth(m), pago=paidMonth(m), falta=tot-pago;
+  const pct=tot>0?Math.round(pago/tot*100):0;
+  let html=`<div class="kpis">
+    <div class="kpi"><div class="lbl">Total a pagar</div><div class="val">${money(tot)}</div></div>
+    <div class="kpi pago"><div class="lbl">Já paguei</div><div class="val">${money(pago)}</div></div>
+    <div class="kpi falta"><div class="lbl">Ainda falta</div><div class="val">${money(falta)}</div></div>
+    <div class="kpi pct"><div class="lbl">% pago</div><div class="val">${pct}%</div><div class="bar"><i style="width:${pct}%"></i></div></div>
+  </div>`;
+  html+=`<div class="sec-h"><h2>Conta / Fonte</h2><div class="ln"></div></div><div class="grid">`;
+  S.fontes.forEach(f=>{
+    const es=entriesOfMonth(m).filter(e=>e.fonte===f); if(!es.length)return;
+    const t=es.reduce((s,e)=>s+valOf(e,m),0), p=es.filter(e=>isPaid(e,m)).reduce((s,e)=>s+valOf(e,m),0);
+    const pc=t>0?Math.round(p/t*100):0, meta=S.fonteMeta[f]||{tipo:"",vence:"—"}, allPaid=es.every(e=>isPaid(e,m));
+    html+=`<div class="fcard"><div class="top"><div><div class="nm">${f}</div><div class="sub">${meta.tipo} · vence ${meta.vence}</div></div>
+      <div class="amt">${money(t)}<br><span class="baixa ${allPaid?'pago':''}" style="display:inline-block;margin-top:6px;min-width:0;padding:3px 9px;font-size:11px">${allPaid?'PAGO':pc+'% pago'}</span></div></div>
+      <div class="bar"><i style="width:${pc}%"></i></div>
+      <div class="meta"><span>${es.length} lançamento(s)</span><span>${money(p)} pago · ${money(t-p)} falta</span></div></div>`;
+  });
+  html+=`</div><p class="muted" style="margin-top:14px">💡 Fatura = provisione antes do vencimento. Débito = sai sozinho da conta. Toque em <b>CUSTOS</b> pra dar baixa em cada item.</p>`;
+  return html;
+}
+
+/* ---------- CUSTOS ---------- */
+function vCustos(){
+  const m=S.month; let es=entriesOfMonth(m); const q=filt.q.toLowerCase();
+  es=es.filter(e=>{
+    if(filt.fonte&&e.fonte!==filt.fonte)return false;
+    if(filt.cat&&e.categoria!==filt.cat)return false;
+    if(filt.st==='pago'&&!isPaid(e,m))return false;
+    if(filt.st==='pend'&&isPaid(e,m))return false;
+    if(q&&!((e.oQueE||'')+' '+(e.detalhe||'')).toLowerCase().includes(q))return false;
+    return true;
+  });
+  es.sort((a,b)=>valOf(b,m)-valOf(a,m));
+  const tot=es.reduce((s,e)=>s+valOf(e,m),0);
+  let html=`<div class="toolbar">
+    <input type="search" id="fq" placeholder="Buscar custo..." value="${filt.q}">
+    <select id="ff"><option value="">Todas fontes</option>${S.fontes.map(f=>`<option ${filt.fonte===f?'selected':''}>${f}</option>`).join('')}</select>
+    <select id="fc"><option value="">Todas categorias</option>${S.categorias.map(c=>`<option ${filt.cat===c?'selected':''}>${c}</option>`).join('')}</select>
+    <select id="fs"><option value="">Todos</option><option value="pend" ${filt.st==='pend'?'selected':''}>Pendentes</option><option value="pago" ${filt.st==='pago'?'selected':''}>Pagos</option></select>
+    <button class="add" id="addBtn">＋ Novo custo</button></div>`;
+  html+=`<div class="muted" style="margin:2px 2px 10px">${es.length} lançamento(s) · total ${money(tot)} · ${m}</div>`;
+  if(!es.length)html+=`<div class="empty">Nenhum custo neste filtro.<br>Toque em <b>＋ Novo custo</b> pra lançar.</div>`;
+  html+=`<div class="list">`;
+  es.forEach(e=>{const paid=isPaid(e,m);
+    html+=`<div class="row ${paid?'is-pago':''}"><div class="main">
+        <div class="nm">${e.oQueE||'(sem nome)'}</div><div class="det">${e.detalhe||''}</div>
+        <div class="chips"><span class="chip tipo">${e.tipo||''}</span><span class="chip">${e.fonte||''}</span>
+          <span class="chip cat" style="background:${catColor(e.categoria)}">${e.categoria||''}</span></div>
+        <div class="rowact"><button data-edit="${e.id}">✎ editar</button><button data-del="${e.id}">🗑 excluir</button></div></div>
+      <div class="amt">${money(valOf(e,m))}${e.euro?`<small>€ ${fmt(e.euro)}</small>`:''}</div>
+      <button class="baixa ${paid?'pago':''}" data-baixa="${e.id}">${paid?'✓ PAGO':'Dar baixa'}</button></div>`;
+  });
+  return html+`</div>`;
+}
+function wireCustos(){
+  const r=()=>render();
+  document.getElementById('fq').oninput=e=>{filt.q=e.target.value;clearTimeout(window._t);window._t=setTimeout(r,200);};
+  document.getElementById('ff').onchange=e=>{filt.fonte=e.target.value;r();};
+  document.getElementById('fc').onchange=e=>{filt.cat=e.target.value;r();};
+  document.getElementById('fs').onchange=e=>{filt.st=e.target.value;r();};
+  document.getElementById('addBtn').onclick=()=>openModal();
+  document.querySelectorAll('[data-baixa]').forEach(b=>b.onclick=()=>{
+    const e=S.entries.find(x=>x.id===b.dataset.baixa);e.paid=e.paid||{};e.paid[S.month]=!e.paid[S.month];
+    save();toast(e.paid[S.month]?'Baixa dada ✓':'Marcado como pendente');render();});
+  document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openModal(b.dataset.edit));
+  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+    if(confirm('Excluir este custo? (some de todos os meses)')){S.entries=S.entries.filter(x=>x.id!==b.dataset.del);save();toast('Excluído');render();}});
+}
+
+/* ---------- MODAL ---------- */
+function openModal(id){
+  const e=id?S.entries.find(x=>x.id===id):null;
+  const mIdx=S.months.indexOf(S.month);
+  const o=document.getElementById('ov'),md=document.getElementById('modal');
+  const selOpts=(arr,cur)=>arr.map(x=>`<option ${x===cur?'selected':''}>${x}</option>`).join('');
+  md.innerHTML=`<h3>${e?'Editar custo':'Novo custo'}<button id="mx">×</button></h3>
+    <div class="fld"><label>O QUE É</label><input id="i_oq" value="${e?escAttr(e.oQueE):''}" placeholder="Ex: ALUGUEL"></div>
+    <div class="fld"><label>DETALHE</label><input id="i_det" value="${e?escAttr(e.detalhe):''}" placeholder="Ex: PORTUGAL"></div>
+    <div class="fld two"><div><label>TIPO</label><select id="i_tipo">${selOpts(S.tipos,e?e.tipo:'MENSAL')}</select></div>
+      <div><label>FONTE</label><select id="i_fonte">${selOpts(S.fontes,e?e.fonte:S.fontes[0])}</select></div></div>
+    <div class="fld"><label>CATEGORIA</label><select id="i_cat">${selOpts(S.categorias,e?e.categoria:'FIXOS')}</select></div>
+    <div class="fld two"><div><label>VALOR R$ (no mês)</label><input id="i_val" type="number" inputmode="decimal" step="0.01" value="${e?valOf(e,S.month)||'':''}" placeholder="0,00"></div>
+      <div><label>€ EURO (opcional)</label><input id="i_eur" type="number" inputmode="decimal" step="0.01" value="${e&&e.euro?e.euro:''}" placeholder="taxa ${fmt(S.rate)}"></div></div>
+    <div class="hint" id="eurHint"></div>
+    ${e?'':`<div class="fld"><label>Repetir a partir de ${S.month}</label><div class="seg" id="rep">
+        <button data-rep="1" class="on">Só este mês</button><button data-rep="3">Próx. 3</button>
+        <button data-rep="6">Próx. 6</button><button data-rep="all">Até ${S.months[S.months.length-1]}</button></div></div>`}
+    <button class="save" id="msave">${e?'Salvar alterações':'Adicionar custo'}</button>
+    ${e?`<button class="danger" id="mdel">Excluir custo</button>`:''}`;
+  o.classList.add('show');
+  let rep="1";
+  const eurI=document.getElementById('i_eur'),valI=document.getElementById('i_val'),hint=document.getElementById('eurHint');
+  const upd=()=>{const eu=parseFloat(eurI.value);hint.textContent=eu>0?`€ ${fmt(eu)} × ${fmt(S.rate)} = ${money(eu*S.rate)} (preenche o valor automaticamente)`:'';};
+  eurI.oninput=upd;upd();
+  if(!e)document.querySelectorAll('[data-rep]').forEach(b=>b.onclick=()=>{rep=b.dataset.rep;document.querySelectorAll('[data-rep]').forEach(x=>x.classList.remove('on'));b.classList.add('on');});
+  document.getElementById('mx').onclick=closeModal;
+  o.onclick=ev=>{if(ev.target===o)closeModal();};
+  if(e&&document.getElementById('mdel'))document.getElementById('mdel').onclick=()=>{if(confirm('Excluir este custo?')){S.entries=S.entries.filter(x=>x.id!==e.id);save();closeModal();toast('Excluído');render();}};
+  document.getElementById('msave').onclick=()=>{
+    const oq=document.getElementById('i_oq').value.trim();
+    const eu=parseFloat(eurI.value)||null; let val=parseFloat(valI.value);
+    if((!val||isNaN(val))&&eu)val=eu*S.rate; val=val||0;
+    if(!oq){toast('Preencha O QUE É',true);return;}
+    const base={oQueE:oq,detalhe:document.getElementById('i_det').value.trim(),tipo:document.getElementById('i_tipo').value,
+      fonte:document.getElementById('i_fonte').value,categoria:document.getElementById('i_cat').value,euro:eu};
+    if(e){Object.assign(e,base);e.vals[S.month]=val;}
+    else{const ent={id:uid(),...base,vals:{},paid:{}};
+      let span=1;if(rep==='3')span=3;else if(rep==='6')span=6;else if(rep==='all')span=S.months.length-mIdx;
+      for(let i=0;i<span;i++){const mk=S.months[mIdx+i];if(mk)ent.vals[mk]=val;} S.entries.push(ent);}
+    save();closeModal();toast(e?'Salvo ✓':'Custo adicionado ✓');render();
+  };
+}
+function closeModal(){document.getElementById('ov').classList.remove('show');}
+function escAttr(s){return (s||'').replace(/"/g,'&quot;');}
+
+/* ---------- RESUMO ---------- */
+function vResumo(){
+  const m=S.month, groups={}; S.categorias.forEach(c=>groups[c]=0);
+  entriesOfMonth(m).forEach(e=>{groups[e.categoria]=(groups[e.categoria]||0)+valOf(e,m);});
+  const tot=Object.values(groups).reduce((a,b)=>a+b,0), max=Math.max(1,...Object.values(groups));
+  let html=`<div class="sec-h"><h2>Para onde vai o dinheiro — ${m}</h2><div class="ln"></div></div>`;
+  Object.entries(groups).sort((a,b)=>b[1]-a[1]).forEach(([c,v])=>{
+    const pc=Math.round(v/max*100), share=tot>0?Math.round(v/tot*100):0;
+    html+=`<div class="brow"><div class="bn">${c}<small>${share}% do mês</small></div>
+      <div class="bb"><i style="width:${pc}%;background:${catColor(c)}"></i></div><div class="bv">${money(v)}</div></div>`;
+  });
+  html+=`<div class="totrow"><span>TOTAL</span><span>${money(tot)}</span></div>`;
+  const sobra=S.rendaFixa-tot;
+  html+=`<div class="totrow"><span>SOBRA / FALTA <small class="muted">(renda ${money(S.rendaFixa)})</small></span><span class="sobra ${sobra>=0?'pos':'neg'}">${money(sobra)}</span></div>`;
+  return html;
+}
+
+/* ---------- POR FONTE ---------- */
+function vFonte(){
+  const m=S.month, g={}; S.fontes.forEach(f=>g[f]=0);
+  entriesOfMonth(m).forEach(e=>{g[e.fonte]=(g[e.fonte]||0)+valOf(e,m);});
+  const tot=Object.values(g).reduce((a,b)=>a+b,0),max=Math.max(1,...Object.values(g));
+  let html=`<div class="sec-h"><h2>Quanto sai de cada conta — ${m}</h2><div class="ln"></div></div>`;
+  Object.entries(g).sort((a,b)=>b[1]-a[1]).forEach(([f,v])=>{
+    const meta=S.fonteMeta[f]||{tipo:'',vence:'—'}, pc=Math.round(v/max*100), col=f.startsWith('CARTÃO')?'var(--pend)':'var(--fix)';
+    html+=`<div class="brow"><div class="bn">${f}<small>${meta.tipo} · vence ${meta.vence}</small></div>
+      <div class="bb"><i style="width:${pc}%;background:${col}"></i></div><div class="bv">${money(v)}</div></div>`;
+  });
+  html+=`<div class="totrow"><span>TOTAL</span><span>${money(tot)}</span></div>`;
+  return html+`<p class="muted" style="margin-top:12px">💳 Cartões = fatura que vence. Débitos = sai direto da conta.</p>`;
+}
+
+/* ---------- PROGRESSO ---------- */
+function vProgresso(){
+  let html=`<div class="sec-h"><h2>Progresso do ano — placar de pagamentos</h2><div class="ln"></div></div>`;
+  S.months.forEach(m=>{const t=totalMonth(m),p=paidMonth(m),pc=t>0?Math.round(p/t*100):0; if(t===0)return;
+    const cur=m===S.month;
+    html+=`<div class="brow" style="${cur?'border-color:var(--acc)':''};cursor:pointer" data-go="${m}">
+      <div class="bn">${m}<small>${money(p)} de ${money(t)}</small></div>
+      <div class="bb"><i style="width:${pc}%;background:${pc>=100?'var(--pago)':'var(--acc)'}"></i></div>
+      <div class="bv">${pc}%<br><small class="muted" style="font-weight:500">falta ${money(t-p)}</small></div></div>`;});
+  setTimeout(()=>document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{S.month=b.dataset.go;S.view='controle';save();render();}),0);
+  return html;
+}
+
+/* ---------- DÍVIDAS ---------- */
+function vDividas(){
+  let totJuros=0;
+  const rows=S.dividas.map(d=>{const j=(d.principal&&d.jurosMensal)?d.principal*d.jurosMensal:0; totJuros+=j;
+    const abate=d.parcela&&j?d.parcela-j:null, pj=d.parcela&&j?Math.round(j/d.parcela*100):null;
+    return `<tr><td>${d.quem||''} · <b>${d.nome||''}</b></td><td>${d.principal?money(d.principal):'—'}</td>
+      <td>${d.jurosMensal!=null?(d.jurosMensal*100).toFixed(2).replace('.',',')+'%':'—'}</td><td>${d.tempo||'—'}</td>
+      <td>${d.amortiza||'—'}</td><td>${d.parcela?money(d.parcela):'—'}</td><td>${j?money(j):'—'}</td>
+      <td>${abate!=null?money(abate):'—'}</td><td>${pj!=null?pj+'%':'—'}</td></tr>`;}).join('');
+  return `<div class="sec-h"><h2>Dívidas — visão geral</h2><div class="ln"></div></div>
+    <div class="dvwrap"><table class="dv"><thead><tr><th>Quem / Nome</th><th>Principal hoje</th><th>Juros mês</th><th>Falta</th><th>Amortiza?</th><th>Parcela</th><th>Juros/mês R$</th><th>Abate dívida/mês</th><th>% parcela = juro</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>
+    <div class="kpis" style="margin-top:14px"><div class="kpi falta"><div class="lbl">Total juros / mês</div><div class="val">${money(totJuros)}</div></div>
+      <div class="kpi" style="grid-column:span 3"><div class="lbl">Por ano em juros</div><div class="val" style="color:var(--red)">${money(totJuros*12)}</div></div></div>
+    <p class="muted">Juros/mês = principal × taxa. Abate = parcela − juros (quanto da parcela realmente reduz a dívida).</p>`;
+}
+
+/* ---------- CONFIG ---------- */
+function vConfig(){
+  return `<div class="sec-h"><h2>Ajustes</h2><div class="ln"></div></div>
+  <div class="setgrp"><h4>Parâmetros</h4>
+    <div class="setrow"><span>Taxa € → R$</span><input id="cfgRate" type="number" step="0.0001" value="${S.rate}"></div>
+    <div class="setrow"><span>Renda fixa / mês (R$)</span><input id="cfgRenda" type="number" step="1" value="${S.rendaFixa}"></div>
+    <div class="hint">A taxa do € vale para novos lançamentos em €. Valores já lançados ficam como estão.</div>
+    <button class="save" id="cfgSave" style="margin-top:12px">Salvar parâmetros</button></div>
+  <div class="setgrp"><h4>Vencimentos por fonte</h4>
+    ${S.fontes.map(f=>{const m=S.fonteMeta[f]||{vence:''};return `<div class="setrow"><span>${f}</span><input data-venc="${f}" value="${escAttr(m.vence)}" style="width:120px;text-align:left"></div>`;}).join('')}
+    <button class="save" id="vencSave" style="margin-top:8px">Salvar vencimentos</button></div>
+  <div class="setgrp"><h4>Segurança</h4>
+    <div class="setrow"><span>Senha atual</span><input id="pOld" type="password" style="width:140px"></div>
+    <div class="setrow"><span>Nova senha</span><input id="pNew" type="password" style="width:140px"></div>
+    <button class="save" id="passSave" style="margin-top:8px">Trocar senha</button>
+    <button class="danger" id="logout" style="margin-top:8px;background:var(--card2);color:var(--txt);border-color:var(--line)">Sair (logout)</button></div>
+  <div class="setgrp"><h4>Backup & exportação</h4>
+    <p class="hint" style="margin-bottom:10px">Seus dados ficam na nuvem (Supabase). Backup local opcional.</p>
+    <div class="btnrow"><button id="expJson">⬇ Backup (.json)</button><button id="impJson">⬆ Restaurar backup</button><button id="expCsv">⬇ Exportar CSV</button></div>
+    <input type="file" id="fileIn" accept=".json" style="display:none"></div>
+  <div class="setgrp"><h4>Zona de risco</h4>
+    <button class="danger" id="reset">Recarregar a planilha original (apaga edições na nuvem)</button></div>`;
+}
+function wireConfig(){
+  document.getElementById('cfgSave').onclick=()=>{S.rate=parseFloat(document.getElementById('cfgRate').value)||S.rate;
+    S.rendaFixa=parseFloat(document.getElementById('cfgRenda').value)||S.rendaFixa;save();toast('Parâmetros salvos ✓');render();};
+  document.getElementById('vencSave').onclick=()=>{document.querySelectorAll('[data-venc]').forEach(i=>{const f=i.dataset.venc;S.fonteMeta[f]=S.fonteMeta[f]||{};S.fonteMeta[f].vence=i.value;});save();toast('Vencimentos salvos ✓');};
+  document.getElementById('passSave').onclick=async()=>{
+    const oldp=document.getElementById('pOld').value,newp=document.getElementById('pNew').value;
+    if(oldp!==PASS){toast('Senha atual incorreta',true);return;}
+    if(!newp||newp.length<4){toast('Nova senha muito curta',true);return;}
+    try{await api('changePass',{newPass:newp});PASS=newp;localStorage.setItem(PKEY,newp);toast('Senha trocada ✓');render();}
+    catch(e){toast(e.message,true);}};
+  document.getElementById('logout').onclick=()=>{localStorage.removeItem(PKEY);PASS=null;location.reload();};
+  document.getElementById('expJson').onclick=()=>dl('nelsinho_contas_backup.json',JSON.stringify(S,null,1),'application/json');
+  document.getElementById('impJson').onclick=()=>document.getElementById('fileIn').click();
+  document.getElementById('fileIn').onchange=ev=>{const f=ev.target.files[0];if(!f)return;const rd=new FileReader();
+    rd.onload=()=>{try{const d=JSON.parse(rd.result);if(d.entries){S=d;save();toast('Backup restaurado ✓');render();}else toast('Arquivo inválido',true);}catch(e){toast('Erro ao ler arquivo',true);}};rd.readAsText(f);};
+  document.getElementById('expCsv').onclick=exportCsv;
+  document.getElementById('reset').onclick=()=>{if(confirm('Recarregar a planilha original? Isso apaga as edições salvas na nuvem.')){S=seedState();save();toast('Recarregado');render();}};
+}
+function exportCsv(){
+  const cols=['O QUE É','TIPO','FONTE','CATEGORIA','DETALHE','€',...S.months,...S.months.map(m=>'PAGO '+m)];
+  const lines=[cols.join(';')];
+  S.entries.forEach(e=>{const row=[e.oQueE,e.tipo,e.fonte,e.categoria,e.detalhe,e.euro||'',
+      ...S.months.map(m=>e.vals[m]!=null?String(e.vals[m]).replace('.',','):''),...S.months.map(m=>isPaid(e,m)?'PAGO':'')];
+    lines.push(row.map(c=>`"${(c==null?'':String(c)).replace(/"/g,'""')}"`).join(';'));});
+  dl('CUSTOS_export.csv','﻿'+lines.join('\n'),'text/csv');
+}
+function dl(name,content,type){const b=new Blob([content],{type});const u=URL.createObjectURL(b);
+  const a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
+
+/* ---------- TOAST ---------- */
+let tt;function toast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(tt);tt=setTimeout(()=>t.className='toast',1800);}
+
+/* ---------- NAV ---------- */
+function wireNav(){
+  document.getElementById('mSel').onchange=e=>{S.month=e.target.value;save();render();};
+  document.getElementById('mPrev').onclick=()=>{const i=S.months.indexOf(S.month);if(i>0){S.month=S.months[i-1];save();render();}};
+  document.getElementById('mNext').onclick=()=>{const i=S.months.indexOf(S.month);if(i<S.months.length-1){S.month=S.months[i+1];save();render();}};
+}
+
+/* ---------- AUTH GATE ---------- */
+function gateView(html){document.getElementById('gateBody').innerHTML=html;}
+function showLogin(){
+  gateView(`<p>Digite sua senha pra acessar.</p>
+    <input id="gp" type="password" placeholder="senha" autocomplete="current-password">
+    <div class="ge" id="ge"></div><button id="gb">Entrar</button>`);
+  const go=async()=>{const p=document.getElementById('gp').value;if(!p)return;
+    document.getElementById('gb').textContent='Entrando…';
+    PASS=p;
+    try{await api('login');localStorage.setItem(PKEY,p);await afterAuth();}
+    catch(e){PASS=null;document.getElementById('ge').textContent=e.message;document.getElementById('gb').textContent='Entrar';}};
+  document.getElementById('gb').onclick=go;
+  document.getElementById('gp').addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+  document.getElementById('gp').focus();
+}
+function showSetup(){
+  gateView(`<p>Primeiro acesso — crie uma senha pra proteger suas contas.</p>
+    <input id="gp1" type="password" placeholder="crie uma senha (mín. 4)" autocomplete="new-password">
+    <input id="gp2" type="password" placeholder="repita a senha" autocomplete="new-password">
+    <div class="ge" id="ge"></div><button id="gb">Criar e entrar</button>`);
+  const go=async()=>{const a=document.getElementById('gp1').value,b=document.getElementById('gp2').value;
+    if(a.length<4){document.getElementById('ge').textContent='Senha muito curta (mín. 4).';return;}
+    if(a!==b){document.getElementById('ge').textContent='As senhas não batem.';return;}
+    document.getElementById('gb').textContent='Criando…';
+    try{await api('setup',{newPass:a});PASS=a;localStorage.setItem(PKEY,a);await afterAuth();}
+    catch(e){document.getElementById('ge').textContent=e.message;document.getElementById('gb').textContent='Criar e entrar';}};
+  document.getElementById('gb').onclick=go;
+}
+async function afterAuth(){
+  // load cloud state
+  let loaded=null;
+  try{const res=await api('load');loaded=res.data;}catch(e){
+    // offline: usa cache
+    try{loaded=JSON.parse(localStorage.getItem(CACHE));}catch(_){}
+  }
+  if(loaded&&loaded.entries){S=loaded;}
+  else{S=seedState();try{await api('save',{data:S});}catch(e){}}
+  cacheLocal();
+  document.getElementById('gate').style.display='none';
+  document.getElementById('hdr').style.display='';
+  document.getElementById('app').style.display='';
+  wireNav();setSync('ok');render();
+}
+async function boot(){
+  try{
+    const st=await api('status');
+    if(st.needsSetup)showSetup();
+    else if(PASS){ // tem senha salva, tenta direto
+      try{await api('login');await afterAuth();}catch(e){showLogin();}
+    } else showLogin();
+  }catch(e){
+    gateView(`<p>Sem conexão com o servidor.</p><div class="ge">${e.message}</div><button id="gb">Tentar de novo</button>`);
+    document.getElementById('gb').onclick=boot;
+  }
+}
+boot();
+</script>
+</body>
+</html>
