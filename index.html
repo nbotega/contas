@@ -1632,8 +1632,9 @@ function wireCustos(){
 }
 
 /* ---------- MODAL ---------- */
-function openModal(id){
+function openModal(id, preset){
   const e=id?S.entries.find(x=>x.id===id):null;
+  preset=preset||{};
   const mIdx=S.months.indexOf(S.month);
   const o=document.getElementById('ov'),md=document.getElementById('modal');
   const selOpts=(arr,cur)=>arr.map(x=>`<option ${x===cur?'selected':''}>${x}</option>`).join('');
@@ -1641,8 +1642,8 @@ function openModal(id){
     <div class="fld"><label>O QUE É</label><input id="i_oq" value="${e?escAttr(e.oQueE):''}" placeholder="Ex: ALUGUEL"></div>
     <div class="fld"><label>DETALHE</label><input id="i_det" value="${e?escAttr(e.detalhe):''}" placeholder="Ex: PORTUGAL"></div>
     <div class="fld two"><div><label>TIPO</label><select id="i_tipo">${selOpts(S.tipos,e?e.tipo:'MENSAL')}</select></div>
-      <div><label>FONTE</label><select id="i_fonte">${selOpts(S.fontes,e?e.fonte:S.fontes[0])}</select></div></div>
-    <div class="fld"><label>CATEGORIA</label><select id="i_cat">${selOpts(S.categorias,e?e.categoria:'FIXOS')}</select></div>
+      <div><label>FONTE</label><select id="i_fonte">${selOpts(S.fontes,e?e.fonte:(preset.fonte||S.fontes[0]))}</select></div></div>
+    <div class="fld"><label>CATEGORIA</label><select id="i_cat">${selOpts(S.categorias,e?e.categoria:(preset.categoria||'FIXOS'))}</select></div>
     <div class="fld two"><div><label>VALOR R$ (no mês)</label><input id="i_val" type="number" inputmode="decimal" step="0.01" value="${e?valOf(e,S.month)||'':''}" placeholder="0,00"></div>
       <div><label>€ EURO (opcional)</label><input id="i_eur" type="number" inputmode="decimal" step="0.01" value="${e&&e.euro?e.euro:''}" placeholder="taxa ${fmt(S.rate)}"></div></div>
     <div class="hint" id="eurHint"></div>
@@ -1711,7 +1712,9 @@ function vResumo(){
     let sub;
     if(byFonte){const meta=S.fonteMeta[k]||{tipo:'',vence:'—'}; sub=`${meta.tipo} · vence ${meta.vence}`;} else sub=`${share}% do mês`;
     html+=`<div class="brow" style="cursor:pointer" data-rkey="${escAttr(k)}"><div class="bn">${open?'▾':'▸'} ${k}<small>${sub}</small></div>
-      <div class="bb"><i style="width:${pc}%;background:${col}"></i></div><div class="bv">${money(v)}</div></div>`;
+      <div class="bb"><i style="width:${pc}%;background:${col}"></i></div>
+      <div class="bv" style="display:flex;flex-direction:column;align-items:flex-end;gap:5px"><span>${money(v)}</span>
+        <button data-radd="${escAttr(k)}" style="background:var(--card2);border:1px solid var(--line);color:var(--acc);border-radius:8px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer">＋ custo</button></div></div>`;
     if(open){
       const list=(items[k]||[]).slice().sort((a,b)=>valOf(b,m)-valOf(a,m));
       html+=`<div style="margin:-3px 0 10px;background:var(--card);border:1px solid var(--line);border-radius:11px;overflow:hidden">`;
@@ -1735,6 +1738,7 @@ function vResumo(){
     document.querySelectorAll('[data-rmode]').forEach(b=>b.onclick=()=>{resumoMode=b.dataset.rmode;resumoOpen=null;render();});
     document.querySelectorAll('[data-rkey]').forEach(b=>b.onclick=()=>{resumoOpen=resumoOpen===b.dataset.rkey?null:b.dataset.rkey;render();});
     document.querySelectorAll('[data-redit]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();openModal(b.dataset.redit);});
+    document.querySelectorAll('[data-radd]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();openModal(null, byFonte?{fonte:b.dataset.radd}:{categoria:b.dataset.radd});});
   },0);
   return html;
 }
