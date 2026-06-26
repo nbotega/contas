@@ -1646,9 +1646,10 @@ function openModal(id){
     <div class="fld two"><div><label>VALOR R$ (no mês)</label><input id="i_val" type="number" inputmode="decimal" step="0.01" value="${e?valOf(e,S.month)||'':''}" placeholder="0,00"></div>
       <div><label>€ EURO (opcional)</label><input id="i_eur" type="number" inputmode="decimal" step="0.01" value="${e&&e.euro?e.euro:''}" placeholder="taxa ${fmt(S.rate)}"></div></div>
     <div class="hint" id="eurHint"></div>
-    ${e?'':`<div class="fld"><label>Repetir a partir de ${S.month}</label><div class="seg" id="rep">
-        <button data-rep="1" class="on">Só este mês</button><button data-rep="3">Próx. 3</button>
-        <button data-rep="6">Próx. 6</button><button data-rep="all">Até ${S.months[S.months.length-1]}</button></div></div>`}
+    ${e?'':`<div class="fld"><label>Repetir a partir de ${S.month}</label>
+      <select id="i_rep" style="width:100%;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:11px 12px;font-size:15px">
+        ${Array.from({length:12},(_,i)=>i+1).map(n=>`<option value="${n}">${n===1?'Só este mês':'Por '+n+' meses'}</option>`).join('')}
+      </select></div>`}
     ${e?`<div class="fld"><label>Mover / copiar para outro mês</label>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <select id="i_movem" style="flex:1;min-width:120px;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:11px 12px;font-size:14px">${S.months.filter(x=>x!==S.month).map(x=>`<option>${x}</option>`).join('')}</select>
@@ -1658,11 +1659,9 @@ function openModal(id){
     <button class="save" id="msave">${e?'Salvar alterações':'Adicionar custo'}</button>
     ${e?`<button class="danger" id="mdel">Excluir custo</button>`:''}`;
   o.classList.add('show');
-  let rep="1";
   const eurI=document.getElementById('i_eur'),valI=document.getElementById('i_val'),hint=document.getElementById('eurHint');
   const upd=()=>{const eu=parseFloat(eurI.value);hint.textContent=eu>0?`€ ${fmt(eu)} × ${fmt(S.rate)} = ${money(eu*S.rate)} (preenche o valor automaticamente)`:'';};
   eurI.oninput=upd;upd();
-  if(!e)document.querySelectorAll('[data-rep]').forEach(b=>b.onclick=()=>{rep=b.dataset.rep;document.querySelectorAll('[data-rep]').forEach(x=>x.classList.remove('on'));b.classList.add('on');});
   document.getElementById('mx').onclick=closeModal;
   o.onclick=ev=>{if(ev.target===o)closeModal();};
   if(e&&document.getElementById('mdel'))document.getElementById('mdel').onclick=()=>{if(confirm('Excluir este custo?')){S.entries=S.entries.filter(x=>x.id!==e.id);save();closeModal();toast('Excluído');render();}};
@@ -1684,7 +1683,7 @@ function openModal(id){
       fonte:document.getElementById('i_fonte').value,categoria:document.getElementById('i_cat').value,euro:eu};
     if(e){Object.assign(e,base);e.vals[S.month]=val;}
     else{const ent={id:uid(),...base,vals:{},paid:{}};
-      let span=1;if(rep==='3')span=3;else if(rep==='6')span=6;else if(rep==='all')span=S.months.length-mIdx;
+      const repSel=document.getElementById('i_rep'); let span=repSel?parseInt(repSel.value)||1:1;
       for(let i=0;i<span;i++){const mk=S.months[mIdx+i];if(mk)ent.vals[mk]=val;} S.entries.push(ent);}
     save();closeModal();toast(e?'Salvo ✓':'Custo adicionado ✓');render();
   };
